@@ -110,7 +110,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     hBm = CreateCompatibleBitmap(hDC, w, h);
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
-    //SendMessage(hWnd, WM_TIMER, 0, 0);
+    SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
@@ -126,9 +126,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     ScreenToClient(hWnd, &pt);
     /* calling draw eye func */
     srand(111);
-    r = 55;
+    r = 44;
     r1 = 16;
-    for(i = r; i < h; i += 2 * r + rand() % 31 + 15)
+    for(i = r; i < h; i += 2 * r + rand() % 31 + 17)
       for(j = r; j < w; j += 2 * r + rand() % 49 + 20)
         DrawEye(hMemDC, j, i, r + rand() % 13, r1, pt.x, pt.y); 
 
