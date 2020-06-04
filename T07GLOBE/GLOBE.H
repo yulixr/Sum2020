@@ -18,3 +18,6 @@ typedef struct
 
 VOID GlobeSet( DBL Xc, DBL Yc, DBL R );
 VOID GlobeDraw( HDC hDC );
+VEC VecRotateZ( VEC V, DBL Angle );
+VEC VecRotateX( VEC V, DBL Angle );
+VEC VecRotateY( VEC V, DBL Angle );

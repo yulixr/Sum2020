@@ -1,14 +1,14 @@
 /* YR4, 04.06.2020 */
 #include "GLOBE.H"
+#include "TIMER.H"
 #include <time.h>
 
 VEC G[GLOBE_H][GLOBE_W];
 
 /* Store coord syst center */
-
 static INT CenterX, CenterY;
 
-/* Rotate vector around z axis func
+/* Rotate vector around z\y\x axis functions
  * ARGUMENTS:
  *   -vector to rotate
  *      VEC V;
@@ -53,8 +53,6 @@ VEC VecRotateX(VEC V, DOUBLE Angle)
     return r;
 }
 
-
-
 /* Fill geometry func
  * ARGUMENTS:
  *   -Coordinates
@@ -74,7 +72,7 @@ VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
     for (j = 0, p = 0; j < GLOBE_W; j++, p += 2 * PI / (GLOBE_W - 1))
      { 
         G[i][j].X = R * cos(p) * sin(t);
-        G[i][j].Y =  R * cos(t);
+        G[i][j].Y = R * cos(t);
         G[i][j].Z = R * sin(p) * sin(t);
      }
 } /* end globeset func */
@@ -90,22 +88,22 @@ VOID GlobeDraw( HDC hDC )
   INT i, j;
   DBL t = (DBL)clock() / CLOCKS_PER_SEC;
   DBL z[GLOBE_H][GLOBE_W];
-  static POINT pnt[GLOBE_H][GLOBE_W];
-   
-  /* draw using dots */
+  static POINT pnt[GLOBE_H][GLOBE_W]; 
 
+  /* initialize structures */
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
     {
        VEC 
-         v1 = VecRotateY(G[i][j], 20 * t),
-         v = VecRotateX(v1, 10 * t);
+         v1 = VecRotateY(G[i][j], 20 * GLB_Time),
+         v = VecRotateX(v1, 10 * GLB_Time);
        
        z[i][j] = v.Z;
        pnt[i][j].x = CenterX + (INT)v.X,
        pnt[i][j].y = CenterY - (INT)v.Y; 
     }
-  
+
+  /* draw using dots */
   SelectObject(hDC, GetStockObject(DC_BRUSH));
   SetDCBrushColor(hDC, RGB(0, 0, 0));
   for (i = 0; i < GLOBE_H; i++)
@@ -155,5 +153,5 @@ VOID GlobeDraw( HDC hDC )
         SetDCPenColor(hDC, RGB(50, 50, 0));
         Polygon(hDC, ps, 4);
         }
-      } 
+      }
 } /*end drawglobe func */

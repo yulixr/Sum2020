@@ -5,6 +5,7 @@
 */
 
 #include "GLOBE.H"
+#include "TIMER.H"
 
 #define WND_CLASS_NAME "My Class Name"
 
@@ -46,8 +47,15 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, CmdShow);
   
   /* Message loop */
-  while (GetMessage(&msg, NULL, 0, 0))
-    DispatchMessage(&msg);
+  while (TRUE)
+    if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
+      if (msg.message == WM_QUIT)
+        break;
+      DispatchMessage(&msg);
+    }
+    else
+      SendMessage(hWnd, WM_TIMER, 47, 0);
 
   return 0;
 } /* End of 'WinMain' func */
@@ -103,6 +111,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   SYSTEMTIME st;
   PAINTSTRUCT ps;
   INT x, y;
+  static CHAR Buf[100];
   
   switch(Msg)
   {
@@ -123,10 +132,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 
     /* set globe coordinates */
     GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.4);
-
-    SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_CREATE:
+    GLB_TimerInit();
     SetTimer(hWnd, 30, 60, NULL);
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
@@ -140,16 +148,21 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
+    if (wParam == 'p')
+      GLB_IsPause = !GLB_IsPause;
     return 0;
   case WM_TIMER:
     /* cleaning background */
     SelectObject(hMemDC, GetStockObject(WHITE_BRUSH));
     SelectObject(hMemDC, GetStockObject(NULL_PEN));
     Rectangle(hMemDC, 0, 0, w + 1, h + 1); 
-
-    /* draw globe */
     
+    
+    /* draw globe */
     GlobeDraw(hMemDC);
+    GLB_TimerResponse();
+    SetTextColor(hMemDC, RGB(2, 5, 55));
+    TextOut(hMemDC, 8, 18, Buf, sprintf(Buf, "FPS: %.3f", GLB_FPS));
 
     /* sent repaint msg */
     InvalidateRect(hWnd, NULL, FALSE);
