@@ -157,10 +157,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SelectObject(hMemDC, GetStockObject(NULL_PEN));
     Rectangle(hMemDC, 0, 0, w + 1, h + 1); 
     
-    
+    GLB_TimerResponse();
+
     /* draw globe */
     GlobeDraw(hMemDC);
-    GLB_TimerResponse();
+
+    /* print fps */
     SetTextColor(hMemDC, RGB(2, 5, 55));
     TextOut(hMemDC, 8, 18, Buf, sprintf(Buf, "FPS: %.3f", GLB_FPS));
 

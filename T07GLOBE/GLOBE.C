@@ -1,4 +1,5 @@
 /* YR4, 04.06.2020 */
+
 #include "GLOBE.H"
 #include "TIMER.H"
 #include <time.h>
@@ -29,7 +30,7 @@ VEC VecRotateZ( VEC V, DBL Angle )
   return r;
 }
 
-VEC VecRotateY(VEC V, DOUBLE Angle)
+VEC VecRotateY(VEC V, DBL Angle)
 {
     DOUBLE a = Angle * PI / 180, si = sin(a), co = cos(a);
     VEC r;
@@ -41,7 +42,7 @@ VEC VecRotateY(VEC V, DOUBLE Angle)
     return r;
 }
 
-VEC VecRotateX(VEC V, DOUBLE Angle)
+VEC VecRotateX(VEC V, DBL Angle)
 {
     DOUBLE a = Angle * PI / 180, si = sin(a), co = cos(a);
     VEC r;
@@ -149,9 +150,9 @@ VOID GlobeDraw( HDC hDC )
              (ps[3].x - ps[0].x) * (ps[3].y + ps[0].y));
         if (k >= 0)
         {
-        SetDCBrushColor(hDC, RGB(100, 150, 0));
-        SetDCPenColor(hDC, RGB(50, 50, 0));
-        Polygon(hDC, ps, 4);
+          SetDCBrushColor(hDC, RGB(100, 150, 0));
+          SetDCPenColor(hDC, RGB(50, 50, 0));
+          Polygon(hDC, ps, 4);
         }
       }
 } /*end drawglobe func */
