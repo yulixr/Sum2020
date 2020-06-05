@@ -60,7 +60,7 @@ __inline VEC VecSet( DBL X, DBL Y, DBL Z )
 __inline VEC VecAddVec( VEC V1, VEC V2 )
 {
   return VecSet(V1.X + V2.X, V1.Y + V2.Y, V1.Z + V2.Z);
-}
+} /* end of func */
 
 /* Subtraction two vectors function.
  * ARGUMENTS:
@@ -72,7 +72,7 @@ __inline VEC VecAddVec( VEC V1, VEC V2 )
 __inline VEC VecSubVec( VEC V1, VEC V2 )
 {
   return VecSet(V1.X - V2.X, V1.Y - V2.Y, V1.Z - V2.Z);
-}
+} /* end of func */
 
 /* Multiply vector to number func.
  * ARGUMENTS:
@@ -86,7 +86,7 @@ __inline VEC VecSubVec( VEC V1, VEC V2 )
 __inline VEC VecMulNum( VEC V1, DBL N )
 {
   return VecSet(V1.X * N, V1.Y * N, V1.Z * N);
-}
+} /* end of func */
 
 /* Division vector to number func.
  * ARGUMENTS:
@@ -100,7 +100,7 @@ __inline VEC VecMulNum( VEC V1, DBL N )
 __inline VEC VecDivNum( VEC V1, DBL N )
 {
   return VecSet(V1.X / N, V1.Y / N, V1.Z / N);
-}
+} /* end of func */
 
 /* Made negativ vector func.
  * ARGUMENTS:
@@ -112,7 +112,7 @@ __inline VEC VecDivNum( VEC V1, DBL N )
 __inline VEC VecNeg( VEC V )             
 {
   return VecSet(-V.X, -V.Y, -V.Z);
-}
+} /* end of func */
 
 /* Dot product of two vectors func.
  * ARGUMENTS:
@@ -124,7 +124,7 @@ __inline VEC VecNeg( VEC V )
 __inline DBL VecDotVec( VEC V1, VEC V2 )
 {
   return V1.X * V2.X + V1.Y * V2.Y + V1.Z * V2.Z;
-}
+} /* end of func */
 
 
 /* Cross product of two vectors func.
@@ -137,7 +137,7 @@ __inline DBL VecDotVec( VEC V1, VEC V2 )
 __inline VEC VecCrossVec( VEC V1, VEC V2 )
 {
   return VecSet(V1.Y * V2.Z - V1.Z * V2.Y, V1.Z * V2.X - V1.X * V2.Z, V1.X * V2.Y - V1.Y * V2.X);
-}
+} /* end of func */
 
 /* Length in square func.
  * ARGUMENTS:
@@ -149,7 +149,7 @@ __inline VEC VecCrossVec( VEC V1, VEC V2 )
 __inline DBL VecLen2( VEC V )
 {
   return VecDotVec(V, V);
-}
+} /* end of func */
 
 /* Length func.
  * ARGUMENTS:
@@ -165,7 +165,7 @@ __inline DBL VecLen( VEC V )
   if (len == 1 || len == 0)
     return len;
   return sqrt(len);
-}
+} /* end of func */
 
 /* Normalize vector func.
  * ARGUMENTS:
@@ -182,7 +182,7 @@ __inline VEC VecNormalize( VEC V )
     return V;
   len = sqrt(len);
   return VecDivNum(V, len);
-}
+} /* end of func */
 
 /* transformations functions */
 
@@ -200,7 +200,7 @@ __inline VEC PointTransform( VEC V, MATR M )
    return VecSet(V.X * M.M[0][0] + V.Y * M.M[1][0] + V.Z * M.M[2][0] + M.M[3][0], 
                  V.X * M.M[0][1] + V.Y * M.M[1][1] + V.Z * M.M[2][1] + M.M[3][1], 
                  V.X * M.M[0][2] + V.Y * M.M[1][2] + V.Z * M.M[2][2] + M.M[3][2]);
-}
+} /* end of func */
 
 /* Transofrm vector using matrix func.
  * ARGUMENTS:
@@ -216,7 +216,7 @@ __inline VEC VectorTransform( VEC V, MATR M )
   return VecSet(V.X * M.M[0][0] + V.Y * M.M[1][0] + V.Z * M.M[2][0], 
                 V.X * M.M[0][1] + V.Y * M.M[1][1] + V.Z * M.M[2][1], 
                 V.X * M.M[0][2] + V.Y * M.M[1][2] + V.Z * M.M[2][2]);
-}
+} /* end of func */
 
 /* Multiply vec with matrix func.
  * ARGUMENTS:
@@ -233,7 +233,7 @@ __inline VEC VecMulMatr( VEC V, MATR M )
   return VecSet((V.X * M.M[0][0] + V.Y * M.M[1][0] + V.Z * M.M[2][0] + M.M[3][0]) / w, 
                 (V.X * M.M[0][1] + V.Y * M.M[1][1] + V.Z * M.M[2][1] + M.M[3][1]) / w,
                 (V.X * M.M[0][2] + V.Y * M.M[1][2] + V.Z * M.M[2][2] + M.M[3][2]) / w);
-}
+} /* end of func */
 
 /* Matrix functions */
 
@@ -253,7 +253,7 @@ static MATR UnitMatrix =
 __inline MATR MatrIdentity( VOID )
 {
   return UnitMatrix;
-}
+} /* end of func */
 
 /* set matrix 4x4 func */
 __inline MATR SetMatr(DBL A00, DBL A01, DBL A02, DBL A03,
@@ -281,7 +281,7 @@ __inline MATR SetMatr(DBL A00, DBL A01, DBL A02, DBL A03,
   m.M[3][3] = A33;
 
   return m;
-}
+} /* end of func */
 
 /* Setting translation matrix func.
  * ARGUMENTS:
@@ -303,7 +303,7 @@ __inline MATR MatrTranslate( VEC T )
   };
 
   return m;
-}
+} /* end of func */
 
 /* Setting scale matrix func.
  * ARGUMENTS:
@@ -325,9 +325,9 @@ __inline MATR MatrScale( VEC S )
   };
 
   return m;
-}
+} /* end of func */
 
-/* Setting rotate X/Y/Z matrix func.
+/* Setting rotation around X/Y/Z axis func.
  * ARGUMENTS:
  *   -angle in degree
  *      DBL AngleInDegree;
@@ -340,7 +340,7 @@ __inline MATR MatrRotateX( DBL AngleInDegree )
       0, cos(D2R(AngleInDegree)), sin(D2R(AngleInDegree)), 0,
       0, -sin(D2R(AngleInDegree)), cos(D2R(AngleInDegree)), 0,
       0, 0, 0, 1);
-}
+} /* end of func */
 
 __inline MATR MatrRotateY( DBL AngleInDegree )
 {
@@ -348,7 +348,7 @@ __inline MATR MatrRotateY( DBL AngleInDegree )
       0, 1, 0, 0,
       sin(D2R(AngleInDegree)), 0, cos(D2R(AngleInDegree)), 0,
       0, 0, 0, 1);
-}
+} /* end of func */
 
 __inline MATR MatrRotateZ( DBL AngleInDegree )
 {
@@ -356,9 +356,9 @@ __inline MATR MatrRotateZ( DBL AngleInDegree )
       -sin(D2R(AngleInDegree)), cos(D2R(AngleInDegree)), 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1);
-}
+} /* end of func */
 
-/* Rotate vector around some axis func.
+/* Rotate vector around axis (by vector) func.
  * ARGUMENTS:
  *   -angle in degree
  *      DBL AngleInDegree;
@@ -386,7 +386,7 @@ __inline MATR MatrRotate( DBL AngleInDegree, VEC V )
   };
 
   return m;
-}
+} /* end of func */
 
 /* Transpose matrix func.
  * ARGUMENTS:
@@ -416,7 +416,7 @@ __inline MATR MatrTranspose( MATR M )
   M1.M[3][2] = M.M[2][3];
   M1.M[3][3] = M.M[3][3];
   return M1;
-}
+} /* end of func */
 
 
 /* Multiply matrix func.
@@ -436,7 +436,7 @@ __inline MATR MatrMulMatr( MATR M1, MATR M2 )
       for (r.M[i][j] = 0, k = 0; k < 4; k++)
         r.M[i][j] += M1.M[i][k] * M2.M[k][j];
   return r;
-}
+} /* end of func */
 
 /* Determination Matrix 3x3 function */
 __inline DBL MatrDeterm3x3( DBL A11, DBL A12, DBL A13,
@@ -445,7 +445,7 @@ __inline DBL MatrDeterm3x3( DBL A11, DBL A12, DBL A13,
 {
   return A11 * A22 * A33 - A11 * A23 * A32 - A12 * A21 * A33 + 
          A12 * A23 * A31 + A13 * A21 * A32 - A13 * A22 * A31;
-}
+} /* end of func */
 
 /* Determination matrix func.
  * ARGUMENTS:
@@ -469,7 +469,7 @@ __inline DBL MatrDeterm( MATR M )
     -M.M[0][3] * MatrDeterm3x3(M.M[1][0], M.M[1][1], M.M[1][2],
                                M.M[2][0], M.M[2][1], M.M[2][2],
                                M.M[3][0], M.M[3][1], M.M[3][2]);
-}
+} /* end of func */
 
 /* Build inversed matrix func.
  * ARGUMENTS:
@@ -569,7 +569,7 @@ __inline MATR MatrInverse( MATR M )
   r.M[0][2] /= det;
   r.M[0][3] /= det;
   return r;
-}
+} /* end of func */
 
 
 #endif /* __MTH_H_ */

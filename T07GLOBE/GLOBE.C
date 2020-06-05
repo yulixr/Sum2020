@@ -10,51 +10,6 @@ VEC G[GLOBE_H][GLOBE_W];
 /* Store coord syst center */
 static INT CenterX, CenterY;
 
-/* Rotate vector around z\y\x axis functions
- * ARGUMENTS:
- *   -vector to rotate
- *      VEC V;
- *   -rotation angle in degrees:
- *      DBL Angle;
- * RETURNS:
- *   (VEC) rotated vector
- */
-VEC VecRotateZ( VEC V, DBL Angle )
-{
-  VEC r;
-  
-  Angle *= PI / 180; 
-  r.X = V.X * cos(Angle) - V.Y * sin(Angle);
-  r.Y = V.X * sin(Angle) + V.Y * cos(Angle);
-  r.Z = V.Z;
-
-  return r;
-}
-
-VEC VecRotateY(VEC V, DBL Angle)
-{
-    DOUBLE a = Angle * PI / 180, si = sin(a), co = cos(a);
-    VEC r;
-
-    r.X = V.X * co - V.Y * si;
-    r.Y = V.X * si + V.Y * co;
-    r.Z = V.Z;
-
-    return r;
-}
-
-VEC VecRotateX(VEC V, DBL Angle)
-{
-    DOUBLE a = Angle * PI / 180, si = sin(a), co = cos(a);
-    VEC r;
-
-    r.Y = V.Y  * co - V.Z * si ;
-    r.Z = V.Y * si + V.Z * co;
-    r.X = V.X;
-
-    return r;
-}
-
 /* Fill geometry func
  * ARGUMENTS:
  *   -Coordinates
@@ -93,7 +48,7 @@ VOID GlobeDraw( HDC hDC )
   static POINT pnt[GLOBE_H][GLOBE_W]; 
   MATR m;
 
-  m = MatrMulMatr(MatrRotateY(GLB_Time * 30), MatrRotate(sin(GLB_Time) * 15, VecSet(1,1,1)));
+  m = MatrMulMatr(MatrRotateY(GLB_Time * 35), MatrRotate(sin(GLB_Time) * 15, VecSet(1,1,1)));
   /* initialize structures */
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
