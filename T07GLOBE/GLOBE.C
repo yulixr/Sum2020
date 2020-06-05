@@ -1,5 +1,6 @@
 /* YR4, 04.06.2020 */
 
+#include "MTH.H"
 #include "GLOBE.H"
 #include "TIMER.H"
 #include <time.h>
@@ -68,7 +69,7 @@ VOID GlobeSet( DBL Xc, DBL Yc, DBL R )
   INT i, j;
   DOUBLE t, p;
 
-  CenterX = Xc, CenterY = Yc;
+  CenterX = (INT)Xc, CenterY = (INT)Yc;
   for (i = 0, t = 0; i < GLOBE_H; i++, t += PI / (GLOBE_H - 1))
     for (j = 0, p = 0; j < GLOBE_W; j++, p += 2 * PI / (GLOBE_W - 1))
      { 
@@ -90,15 +91,16 @@ VOID GlobeDraw( HDC hDC )
   DBL t = (DBL)clock() / CLOCKS_PER_SEC;
   DBL z[GLOBE_H][GLOBE_W];
   static POINT pnt[GLOBE_H][GLOBE_W]; 
+  MATR m;
 
+  m = MatrMulMatr(MatrRotateY(GLB_Time * 30), MatrRotate(sin(GLB_Time) * 15, VecSet(1,1,1)));
   /* initialize structures */
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
     {
        VEC 
-         v1 = VecRotateY(G[i][j], 20 * GLB_Time),
-         v = VecRotateX(v1, 10 * GLB_Time);
-       
+         v = PointTransform(G[i][j], m);
+
        z[i][j] = v.Z;
        pnt[i][j].x = CenterX + (INT)v.X,
        pnt[i][j].y = CenterY - (INT)v.Y; 
@@ -150,7 +152,7 @@ VOID GlobeDraw( HDC hDC )
              (ps[3].x - ps[0].x) * (ps[3].y + ps[0].y));
         if (k >= 0)
         {
-          SetDCBrushColor(hDC, RGB(100, 150, 0));
+          SetDCBrushColor(hDC, RGB(173, 157, 36));
           SetDCPenColor(hDC, RGB(50, 50, 0));
           Polygon(hDC, ps, 4);
         }

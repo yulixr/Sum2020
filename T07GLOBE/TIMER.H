@@ -3,11 +3,11 @@
 #include <time.h>
 #include <windows.h>
 
-LONG StartTime, OldTime, PauseTime, OldFPSTime, FrameCount;
-DOUBLE GLB_Time;
-DOUBLE GLB_DeltaTime;
-DOUBLE GLB_FPS;
-BOOL GLB_IsPause;
+/* global timer variables */
+extern DOUBLE GLB_Time;
+extern DOUBLE GLB_DeltaTime;
+extern DOUBLE GLB_FPS;
+extern BOOL GLB_IsPause;
 
 VOID GLB_TimerInit( VOID );
 VOID GLB_TimerResponse( VOID );

@@ -1,11 +1,12 @@
 /* FILE NAME: T07GLOBE.C
    PROGRAMMER: YR4
    DATE: 04.01.2020
-   PURPOSE: Globe
+   PURPOSE: Globe drawing
 */
 
 #include "GLOBE.H"
 #include "TIMER.H"
+#include <stdio.h>
 
 #define WND_CLASS_NAME "My Class Name"
 
@@ -108,9 +109,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   static int w, h;
   static HDC hMemDC;
   static HBITMAP hBm;
-  SYSTEMTIME st;
   PAINTSTRUCT ps;
-  INT x, y;
   static CHAR Buf[100];
   
   switch(Msg)
@@ -148,7 +147,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
-    if (wParam == 'p')
+    else if (wParam == 'P')
       GLB_IsPause = !GLB_IsPause;
     return 0;
   case WM_TIMER:

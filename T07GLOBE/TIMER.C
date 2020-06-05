@@ -2,6 +2,12 @@
 
 #include "TIMER.H"  
 
+static LONG StartTime, OldTime, PauseTime, OldFPSTime, FrameCount;
+DOUBLE GLB_Time;
+DOUBLE GLB_DeltaTime;
+DOUBLE GLB_FPS;
+BOOL GLB_IsPause;
+
 VOID GLB_TimerInit( VOID )
 {
   StartTime = OldTime = OldFPSTime = clock();
@@ -26,6 +32,7 @@ VOID GLB_TimerResponse( VOID )
   }
 
   FrameCount++;
+
   if (t - OldFPSTime > CLOCKS_PER_SEC)
   {
     GLB_FPS = FrameCount / ((DOUBLE)(t - OldFPSTime) / CLOCKS_PER_SEC);
