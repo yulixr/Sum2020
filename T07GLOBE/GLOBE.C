@@ -43,18 +43,21 @@ VOID GlobeDraw( HDC hDC )
 {
   DBL s = 5, k;
   INT i, j;
-  DBL t = (DBL)clock() / CLOCKS_PER_SEC;
   DBL z[GLOBE_H][GLOBE_W];
   static POINT pnt[GLOBE_H][GLOBE_W]; 
   MATR m;
 
-  m = MatrMulMatr(MatrRotateY(GLB_Time * 35), MatrRotate(sin(GLB_Time) * 15, VecSet(1,1,1)));
+  /* setup transformation */
+  /*m = MatrMulMatr4(MatrRotateY(GLB_Time * 35), 
+    MatrScale(VecSet1(1 + 0.1 * sin(GLB_Time))),
+    MatrRotateX(-20), MatrTranslate(VecSet(102 * sin(3 * GLB_Time), 0, 0)));
+  */
+  m = MatrMulMatr2(MatrRotateY(GLB_Time * 35), MatrView(VecSet(GLB_Time * 5, GLB_Time * 5, 5), VecSet(0, 0, 0), VecSet(0, -1, 0))) ;
   /* initialize structures */
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
     {
-       VEC 
-         v = PointTransform(G[i][j], m);
+       VEC v = PointTransform(G[i][j], m);
 
        z[i][j] = v.Z;
        pnt[i][j].x = CenterX + (INT)v.X,

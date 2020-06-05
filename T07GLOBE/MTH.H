@@ -49,6 +49,20 @@ __inline VEC VecSet( DBL X, DBL Y, DBL Z )
   return v;
 } /* End of 'VecSet' function */
 
+/* Set vector1 function.
+ * ARGUMENTS:
+ *   -Coordinates:
+ *       DBL X;
+ * RETURNS:
+ *   (VEC) result vector.
+ */
+__inline VEC VecSet1( DBL X )
+{
+  VEC v = {X, X, X};
+
+  return v;
+} /* End of 'VecSet' function */
+
 
 /* Add two vectors function.
  * ARGUMENTS:
@@ -178,10 +192,9 @@ __inline VEC VecNormalize( VEC V )
 {
   DBL len = VecDotVec(V, V);
 
-  if (len == 1 || len == 0)
-    return V;
-  len = sqrt(len);
-  return VecDivNum(V, len);
+  if (len != 1 && len != 0)
+      len = sqrt(len), V.X /= len, V.Y /= len, V.Z /= len;
+  return V;
 } /* end of func */
 
 /* transformations functions */
@@ -236,6 +249,11 @@ __inline VEC VecMulMatr( VEC V, MATR M )
 } /* end of func */
 
 /* Matrix functions */
+
+/* helpful macros */
+#define MatrMulMatr2(A, B) MatrMulMatr(A, B)
+#define MatrMulMatr3(A, B, C) MatrMulMatr(MatrMulMatr(A, B), C)
+#define MatrMulMatr4(A, B, C, D) MatrMulMatr(MatrMulMatr(A, B), MatrMulMatr(C, D))
 
 /* Unit matrix definition */ 
 static MATR UnitMatrix =
@@ -570,6 +588,32 @@ __inline MATR MatrInverse( MATR M )
   r.M[0][3] /= det;
   return r;
 } /* end of func */
+
+/* Matrix look-at viewer setup function.
+ * ARGUMENTS:
+ *   - viewer position, look-at point, approximate up direction:
+ *       VEC Loc, At, Up1;
+ * RETURNS:
+ *   (MATR) result matrix.
+ */
+__inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
+{
+  VEC
+    Dir = VecNormalize(VecSubVec(At, Loc)),
+    Right = VecNormalize(VecCrossVec(Dir, Up1)),
+    Up = VecNormalize(VecCrossVec(Right, Dir));
+  MATR m =
+  {
+    {
+      {Right.X, Up.X, -Dir.X, 0},
+      {Right.Y, Up.Y, -Dir.Y, 0},
+      {Right.Z, Up.Z, -Dir.Z, 0},
+      {-VecDotVec(Loc, Right), -VecDotVec(Loc, Up), VecDotVec(Loc, Dir), 1}
+    }
+  };
+
+  return m;
+} /* End of 'MatrView' function */
 
 
 #endif /* __MTH_H_ */
