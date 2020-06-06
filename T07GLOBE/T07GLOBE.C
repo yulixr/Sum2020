@@ -128,9 +128,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     hBm = CreateCompatibleBitmap(hDC, w, h);
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
-
+    SendMessage(hWnd, WM_TIMER, 47, 0);
     /* set globe coordinates */
-    GlobeSet(w / 2, h / 2, (w < h ? w : h) * 0.4);
+    GlobeSet(w / 2, h / 2, 1);
     return 0;
   case WM_CREATE:
     GLB_TimerInit();
@@ -159,6 +159,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     GLB_TimerResponse();
 
     /* draw globe */
+
     GlobeDraw(hMemDC);
 
     /* print fps */

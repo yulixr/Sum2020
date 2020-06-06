@@ -35,6 +35,10 @@ typedef struct tagMATR
 
 /* Math functions */
 
+__inline DBL Power( DBL a, DBL b )
+{
+  return pow(a, b);
+}
 /* Set vector function.
  * ARGUMENTS:
  *   -Coordinates:
@@ -615,6 +619,49 @@ __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
   return m;
 } /* End of 'MatrView' function */
 
+/* Ortho matrix setup function.
+ * ARGUMENTS:
+ *   - Left, right, botton, top, near, far positions:
+ *      DBL L, R, B, T, N, F;
+ * RETURNS:
+ *    (MATR) result matrix;
+ */
+__inline MATR MatrOrtho( DBL L, DBL R, DBL B, DBL T, DBL N, DBL F )
+{
+  MATR m =
+  {
+    {
+      { 2 / (R - L), 0, 0, 0},
+      { 0, 2 / (T - B), 0, 0},
+      { 0, 0, - 2 / (F - N), 0},
+      { - (R + L) / (R - L), - (T + B) / (T - B), - (F + N) / (F - N), 1}
+    }
+  };
+
+  return m;
+} /* End of 'MatrOrtho' function */
+
+/* Frustum matrix setup function.
+ * ARGUMENTS:
+ *   - Left, right, botton, top, near, far positions:
+ *      DBL L, R, B, T, N, F;
+ * RETURNS:
+ *    (MATR) result matrix;
+ */
+__inline MATR MatrFrustum( DBL L, DBL R, DBL B, DBL T, DBL N, DBL F )
+{
+  MATR m =
+  {
+    {
+      { 2 * N / (R - L), 0, 0, 0},
+      { 0, 2 * N / (T - B), 0, 0},
+      { (R + L) / (R - L), (T + B) / (T - B), -(F + N) / (F - N), -1},
+      { 0, 0, -2 * N * F / (F - N), 0}
+    }
+  };
+
+  return m;
+} /* End of 'MatrFrustum' function */
 
 #endif /* __MTH_H_ */
 

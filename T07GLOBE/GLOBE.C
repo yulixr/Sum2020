@@ -46,22 +46,38 @@ VOID GlobeDraw( HDC hDC )
   DBL z[GLOBE_H][GLOBE_W];
   static POINT pnt[GLOBE_H][GLOBE_W]; 
   MATR m;
+  DBL
+    Size = 1.0, Ws = CenterX * 2, Hs = CenterY * 2,
+    Wp = 1.0, Hp = 1.0, ProjDist = 1.0;
+
+  
+
+  /* recalculate Wp and Hp */
+  if (Ws > Hs)
+    Wp = Size * Ws / Hs, Hp = Size;
+  else
+    Hp = Size * Hs / Ws, Wp = Size;
 
   /* setup transformation */
-  /*m = MatrMulMatr4(MatrRotateY(GLB_Time * 35), 
-    MatrScale(VecSet1(1 + 0.1 * sin(GLB_Time))),
-    MatrRotateX(-20), MatrTranslate(VecSet(102 * sin(3 * GLB_Time), 0, 0)));
-  */
-  m = MatrMulMatr2(MatrRotateY(GLB_Time * 35), MatrView(VecSet(GLB_Time * 5, GLB_Time * 5, 5), VecSet(0, 0, 0), VecSet(0, -1, 0))) ;
+  m = MatrMulMatr3(MatrRotateY(GLB_Time * 35), 
+    MatrView(VecSet(sin(GLB_Time * 2) * 5, sin(GLB_Time * 2) * 5, 5), VecSet(0, 0, 0), VecSet(0, 1, 0)),
+    MatrFrustum(-Wp / 2, Wp / 2, -Hp / 2, Hp / 2, Size, 400));
+ 
+  
   /* initialize structures */
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
-    {
-       VEC v = PointTransform(G[i][j], m);
+    {  
+       VEC v;
+
+       /* World Transform */
+       v = VecMulMatr(G[i][j], m);
 
        z[i][j] = v.Z;
-       pnt[i][j].x = CenterX + (INT)v.X,
-       pnt[i][j].y = CenterY - (INT)v.Y; 
+
+       /* parallel projection */       
+       pnt[i][j].x = (INT)((v.X + 1) * Ws / 2.0),
+       pnt[i][j].y = (INT)((-v.Y + 1) * Hs / 2.0); 
     }
 
   /* draw using dots */
@@ -70,7 +86,7 @@ VOID GlobeDraw( HDC hDC )
   for (i = 0; i < GLOBE_H; i++)
     for (j = 0; j < GLOBE_W; j++)
      if (z[i][j] > 0)
-        //Ellipse(hDC, pnt[i][j].x - s, pnt[i][j].y - s, pnt[i][j].x + s, pnt[i][j].y + s); 
+        ;//Ellipse(hDC, pnt[i][j].x - s, pnt[i][j].y - s, pnt[i][j].x + s, pnt[i][j].y + s); 
   
   /* linear draw */
   /*
@@ -97,7 +113,7 @@ VOID GlobeDraw( HDC hDC )
   srand(30);
   for (i = 0; i < GLOBE_H - 1; i++)
     for (j = 0; j < GLOBE_W - 1; j++)
-      { 
+    { 
         POINT ps[4];
         ps[0] = pnt[i][j]; 
         ps[1] = pnt[i][j + 1]; 
@@ -108,11 +124,11 @@ VOID GlobeDraw( HDC hDC )
              (ps[1].x - ps[2].x) * (ps[1].y + ps[2].y) +
              (ps[2].x - ps[3].x) * (ps[2].y + ps[3].y) +
              (ps[3].x - ps[0].x) * (ps[3].y + ps[0].y));
-        if (k >= 0)
+        if (k <= 0)
         {
           SetDCBrushColor(hDC, RGB(173, 157, 36));
           SetDCPenColor(hDC, RGB(50, 50, 0));
           Polygon(hDC, ps, 4);
         }
-      }
+    }
 } /*end drawglobe func */
