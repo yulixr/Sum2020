@@ -34,6 +34,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   MSG msg;
   WNDCLASS wc;
 
+  SetDbgMemHooks();
+
   /* Fill window class structure */
   wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.cbClsExtra = 0;
@@ -81,7 +83,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   HDC hDC;
   static yr4PRIM Pr;
   static yr4PRIM Pr1;
+  static yr4PRIM Pr2;
+  static yr4PRIM Pr3;
+  static yr4PRIM Pr4;
+  static yr4PRIM Pr5;
   LONG t = clock();
+  
 
   switch(Msg)
   {
@@ -91,12 +98,16 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_CREATE:
     YR4_RndInit(hWnd);
-    YR4_RndCamSet(VecSet(7, 18, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
+    YR4_RndCamSet(VecSet(22, 14, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
     SetTimer(hWnd, 30, 60, NULL);
 
-    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 7, 0), 4, 30, 15);
-    YR4_RndPrimCreateThor(&Pr1, VecSet(0, 0, 0), 7, 3, 38, 19);
-    //YR4_RndPrimCreateThor(&Pr, VecSet(0, 0, 0), 7, 3, 38, 19);
+    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 7, 0), 2, 20, 10);
+    YR4_RndPrimLoad(&Pr1, "cow.obj");
+    YR4_RndPrimLoad(&Pr2, "Door.obj");
+    YR4_RndPrimLoad(&Pr3, "table.obj");
+    YR4_RndPrimLoad(&Pr4, "cat.obj");
+    YR4_RndPrimLoad(&Pr5, "deer.obj");
+    //YR4_RndPrimCreateThor(&Pr1, VecSet(0, 0, 0), 7, 3, 38, 19);
     
     return 0;
   case WM_SIZE:
@@ -111,9 +122,14 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     YR4_RndStart();
-    YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(0, sin(5 * t / 2000.0) / 1.5, 0))));
-    YR4_RndPrimDraw(&Pr1, MatrRotateY(30 * t / 2000.0));
-    //YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateX(90), MatrTranslate(VecSet(7, 0, 0))));
+    YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(6, sin(5 * t / 2000.0) / 1.5, 13))));
+    //YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrRotateY(-30), MatrTranslate(VecSet(sin(t / 1000.0) * 4, sin(7 * t / 2000.0), sin(t / 1000.0) * 4))));
+    YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrTranslate(VecSet(-10, fabs(sin(t * 1.5 / 1000.0)) * 6, -15)), MatrRotateY(-t * 40 / 1000.0)));
+    YR4_RndPrimDraw(&Pr2, MatrMulMatr(MatrTranslate(VecSet(3, 0, -10)), MatrRotateY(70)));
+    YR4_RndPrimDraw(&Pr3, MatrMulMatr3(MatrScale(VecSet1(0.039)), MatrRotateY(20), MatrTranslate(VecSet(5, 0, -5))));
+    YR4_RndPrimDraw(&Pr4, MatrMulMatr3(MatrScale(VecSet1(0.018)), MatrTranslate(VecSet(5, 0, -15)), MatrRotateY(-t * 30 / 500.0)));
+    YR4_RndPrimDraw(&Pr5, MatrMulMatr3(MatrRotateY(t * 30 / 1000.0), MatrScale(VecSet1(0.004)), MatrTranslate(VecSet(8.3, 4, -0.5))));
+    //YR4_RndPrimDraw(&Pr1, MatrRotateY(30 * t / 2000.0));
     YR4_RndEnd();
 
     hDC = GetDC(hWnd);
@@ -135,6 +151,11 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_DESTROY:
     YR4_RndPrimFree(&Pr);
+    YR4_RndPrimFree(&Pr1);
+    YR4_RndPrimFree(&Pr2);
+    YR4_RndPrimFree(&Pr3);
+    YR4_RndPrimFree(&Pr4);
+    YR4_RndPrimFree(&Pr5);
     YR4_RndClose();
     KillTimer(hWnd, 30);
     PostMessage(hWnd, WM_QUIT, 0, 0);

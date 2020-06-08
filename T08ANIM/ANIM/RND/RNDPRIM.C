@@ -109,7 +109,7 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
  *       yr4PRIM *Pr;
  *   -Vector (position):
  *       VEC C;
- *   - Ratio:
+ *   - Radius:
  *       DBL R;
  *   - WIdth and height:
  *       INT SplitW, SplitH;
@@ -150,7 +150,7 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
  *       yr4PRIM *Pr;
  *   -Vector (position):
  *       VEC C;
- *   - Ratios:
+ *   - Radiuses:
  *       DBL R, r;
  *   - WIdth and height:
  *       INT SplitW, SplitH;
@@ -183,6 +183,68 @@ BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT Sp
       Pr->I[n++] = m + SplitW + 1;
     }
   return TRUE;
-} /* end of 'YR4_RndPrimCreateSThor' func */
+} /* end of 'YR4_RndPrimCreateThor' func */
+
+#include <stdio.h>
+/* Load model.
+ * ARGUMENTS:
+ *   -Prim structure:
+ *       yr4PRIM *Pr;
+ *   -File name:
+ *       CHAR *FileName;
+ * RETURNS:
+ *   BOOL.
+ */
+BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
+{
+  FILE *F;
+  static CHAR Buf[1000];
+  INT nv = 0, nf = 0;
+  
+  memset(Pr, 0, sizeof(yr4PRIM));
+
+  if ((F = fopen(FileName, "r")) == NULL)
+    return FALSE;
+  
+  /* Vertex and facet count */
+  while (fgets(Buf, sizeof(Buf), F) != NULL)
+    if (Buf[0] == 'v' && Buf[1] == ' ')
+      nv++;
+    else if (Buf[0] == 'f' && Buf[1] == ' ')
+      nf++;
+
+  if (!YR4_RndPrimCreate(Pr, nv, nf * 3))
+  {
+    fclose(F);
+    return FALSE;
+  }
+  
+  /* Load geometry data */
+  rewind(F);
+  nv = nf = 0;
+  while (fgets(Buf, sizeof(Buf), F) != NULL)
+    if (Buf[0] == 'v' && Buf[1] == ' ')
+    {
+      DBL x, y, z;
+      sscanf(Buf + 2, "%lf %lf %lf", &x, &y, &z);
+      Pr->V[nv++].P = VecSet(x, y, z);
+    }
+    else if (Buf[0] == 'f' && Buf[1] == ' ')
+    {
+      INT n1, n2, n3;
+
+      sscanf(Buf + 2, "%d %d %d", &n1, &n2, &n3) == 3 ||
+      sscanf(Buf + 2, "%d/%*d %d/%*d %d/%*d", &n1, &n2, &n3) == 3 ||
+      sscanf(Buf + 2, "%d//%*d %d//%*d %d//%*d", &n1, &n2, &n3) == 3 ||
+      sscanf(Buf + 2, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &n1, &n2, &n3) == 3;
+
+      Pr->I[nf++] = n1 - 1;
+      Pr->I[nf++] = n2 - 1;
+      Pr->I[nf++] = n3 - 1;
+    }
+
+  fclose(F);
+  return TRUE;
+} /* end of 'YR4_RndPrimLoad' func */
 
 /* END OF 'RNDPRIM.C' FILE */

@@ -20,6 +20,7 @@ VOID YR4_RndInit( HWND hWnd )
   HDC hDC;
 
   YR4_hRndWnd = hWnd;
+  GLB_TimerInit(); 
 
   hDC = GetDC(hWnd);
   YR4_hRndDCFrame = CreateCompatibleDC(hDC);
@@ -31,7 +32,6 @@ VOID YR4_RndInit( HWND hWnd )
 
   YR4_RndProjSize = YR4_RndProjDist = 0.1;
   YR4_RndProjFarClip = 30;
-
 } /* End 'YR4_RndInit' function */
 
 /* Close function.
@@ -85,10 +85,14 @@ VOID YR4_RndStart( VOID )
   Rectangle(YR4_hRndDCFrame, 0,0 , YR4_RndFrameW + 1, YR4_RndFrameH + 1);
   SelectObject(YR4_hRndDCFrame, GetStockObject(DC_BRUSH));
   SelectObject(YR4_hRndDCFrame, GetStockObject(BLACK_PEN));
+  GLB_TimerResponse();
 } /* End of 'YR4_RndStart' function */
 
 VOID YR4_RndEnd( VOID )
 {
+  static CHAR Buf[100];
+  SetTextColor(YR4_hRndDCFrame, RGB(2, 5, 55));
+  TextOut(YR4_hRndDCFrame, 8, 18, Buf, sprintf(Buf, "FPS: %.3f", GLB_FPS));
 }
 
 /* Set project function.

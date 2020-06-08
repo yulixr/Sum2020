@@ -193,6 +193,14 @@
 			<Filter
 				Name="Animation System"
 				>
+				<File
+					RelativePath=".\ANIM\TIMER.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\TIMER.H"
+					>
+				</File>
 				<Filter
 					Name="Rendering System"
 					>
