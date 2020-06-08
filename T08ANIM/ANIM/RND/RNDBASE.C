@@ -32,8 +32,6 @@ VOID YR4_RndInit( HWND hWnd )
   YR4_RndProjSize = YR4_RndProjDist = 0.1;
   YR4_RndProjFarClip = 30;
 
-  YR4_RndProjSet();
-  YR4_RndCamSet(VecSet(12, 8, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
 } /* End 'YR4_RndInit' function */
 
 /* Close function.

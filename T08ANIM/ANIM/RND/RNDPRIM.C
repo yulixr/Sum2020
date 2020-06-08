@@ -103,7 +103,19 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
   free(pnts);
 } /* End of 'YR4_RndPrimDraw' function */
 
-
+/* Create sphere prim structure.
+ * ARGUMENTS:
+ *   -Prim structure:
+ *       yr4PRIM *Pr;
+ *   -Vector (position):
+ *       VEC C;
+ *   - Ratio:
+ *       DBL R;
+ *   - WIdth and height:
+ *       INT SplitW, SplitH;
+ * RETURNS:
+ *   BOOL.
+ */
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
 {
   INT i, j, m, n;
@@ -130,6 +142,47 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
       Pr->I[n++] = m + SplitW + 1;
     }
   return TRUE;
-}
+} /* end of 'YR4_RndPrimCreateSphere' func */
+
+/* Create thor prim structure.
+ * ARGUMENTS:
+ *   -Prim structure:
+ *       yr4PRIM *Pr;
+ *   -Vector (position):
+ *       VEC C;
+ *   - Ratios:
+ *       DBL R, r;
+ *   - WIdth and height:
+ *       INT SplitW, SplitH;
+ * RETURNS:
+ *   BOOL.
+ */
+BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH )
+{
+  INT i, j, m, n;
+  DOUBLE t, p;
+
+  if(!YR4_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * 2 * (SplitH - 1) * 3))
+    return FALSE;
+
+  for (i = 0, t = -PI, m = 0; i < SplitH; i++, t += 2 * PI / (SplitH - 1))
+    for (j = 0, p = 0; j < SplitW; j++, p += 2 * PI / (SplitW - 1))
+       Pr->V[m++].P = (VecSet(C.X + (R + r * cos(t)) * cos(p),
+                              C.Y + r * sin(t),
+                              C.Z + (R + r * cos(t)) * sin(p)));
+
+  for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
+    for (j = 0; j < SplitW - 1; j++, m++)
+    {
+      Pr->I[n++] = m;
+      Pr->I[n++] = m + 1;
+      Pr->I[n++] = m + SplitW;
+
+      Pr->I[n++] = m + SplitW;
+      Pr->I[n++] = m + 1;
+      Pr->I[n++] = m + SplitW + 1;
+    }
+  return TRUE;
+} /* end of 'YR4_RndPrimCreateSThor' func */
 
 /* END OF 'RNDPRIM.C' FILE */

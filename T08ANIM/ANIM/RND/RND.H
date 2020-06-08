@@ -58,6 +58,7 @@ VOID YR4_RndPrimFree( yr4PRIM *Pr );
 BOOL YR4_RndPrimCreate( yr4PRIM *Pr, INT NoofV, INT NoofI );
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World );
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
+BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH );
 
 #endif
 /* END OF 'RND.H' FILE */

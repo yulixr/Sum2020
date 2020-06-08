@@ -80,6 +80,8 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   PAINTSTRUCT ps;
   HDC hDC;
   static yr4PRIM Pr;
+  static yr4PRIM Pr1;
+  LONG t = clock();
 
   switch(Msg)
   {
@@ -89,9 +91,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_CREATE:
     YR4_RndInit(hWnd);
+    YR4_RndCamSet(VecSet(7, 18, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
     SetTimer(hWnd, 30, 60, NULL);
 
-    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 0, 0), 8, 47, 30);
+    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 7, 0), 4, 30, 15);
+    YR4_RndPrimCreateThor(&Pr1, VecSet(0, 0, 0), 7, 3, 38, 19);
+    //YR4_RndPrimCreateThor(&Pr, VecSet(0, 0, 0), 7, 3, 38, 19);
     
     return 0;
   case WM_SIZE:
@@ -106,12 +111,15 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     YR4_RndStart();
-    YR4_RndPrimDraw(&Pr, MatrRotateY(30 * clock() / 2000.0));
+    YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(0, sin(5 * t / 2000.0) / 1.5, 0))));
+    YR4_RndPrimDraw(&Pr1, MatrRotateY(30 * t / 2000.0));
+    //YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateX(90), MatrTranslate(VecSet(7, 0, 0))));
     YR4_RndEnd();
 
     hDC = GetDC(hWnd);
     YR4_RndCopyFrame(hDC);
-    InvalidateRect(hWnd, NULL, FALSE);
+    ReleaseDC(hWnd, hDC);
+    //InvalidateRect(hWnd, NULL, FALSE);
     return 0;
   case WM_ERASEBKGND:
     return 1;
