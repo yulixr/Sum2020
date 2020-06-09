@@ -98,15 +98,15 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_CREATE:
     YR4_RndInit(hWnd);
-    YR4_RndCamSet(VecSet(22, 14, 20), VecSet(0, 0, 0), VecSet(0, 1, 0));
+    YR4_RndCamSet(VecSet(0, 15, 26), VecSet(0, 0, 0), VecSet(0, 1, 0));
     SetTimer(hWnd, 30, 60, NULL);
 
-    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 7, 0), 2, 20, 10);
-    YR4_RndPrimLoad(&Pr1, "cow.obj");
-    YR4_RndPrimLoad(&Pr2, "Door.obj");
-    YR4_RndPrimLoad(&Pr3, "table.obj");
+    YR4_RndPrimCreateSphere(&Pr, VecSet(0, 7, 0), 1.5, 20, 10);
+    YR4_RndPrimLoad(&Pr1, "desk.obj");
+    YR4_RndPrimLoad(&Pr2, "notebook.obj");
+    YR4_RndPrimLoad(&Pr3, "chair.obj");
     YR4_RndPrimLoad(&Pr4, "cat.obj");
-    YR4_RndPrimLoad(&Pr5, "deer.obj");
+    YR4_RndPrimLoad(&Pr5, "Door.obj");
     //YR4_RndPrimCreateThor(&Pr1, VecSet(0, 0, 0), 7, 3, 38, 19);
     
     return 0;
@@ -122,14 +122,12 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     YR4_RndStart();
-    YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(6, sin(5 * t / 2000.0) / 1.5, 13))));
-    //YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrRotateY(-30), MatrTranslate(VecSet(sin(t / 1000.0) * 4, sin(7 * t / 2000.0), sin(t / 1000.0) * 4))));
-    YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrTranslate(VecSet(-10, fabs(sin(t * 1.5 / 1000.0)) * 6, -15)), MatrRotateY(-t * 40 / 1000.0)));
-    YR4_RndPrimDraw(&Pr2, MatrMulMatr(MatrTranslate(VecSet(3, 0, -10)), MatrRotateY(70)));
-    YR4_RndPrimDraw(&Pr3, MatrMulMatr3(MatrScale(VecSet1(0.039)), MatrRotateY(20), MatrTranslate(VecSet(5, 0, -5))));
-    YR4_RndPrimDraw(&Pr4, MatrMulMatr3(MatrScale(VecSet1(0.018)), MatrTranslate(VecSet(5, 0, -15)), MatrRotateY(-t * 30 / 500.0)));
-    YR4_RndPrimDraw(&Pr5, MatrMulMatr3(MatrRotateY(t * 30 / 1000.0), MatrScale(VecSet1(0.004)), MatrTranslate(VecSet(8.3, 4, -0.5))));
-    //YR4_RndPrimDraw(&Pr1, MatrRotateY(30 * t / 2000.0));
+    YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(3, 3 + sin(5 * t / 2000.0) / 1.5, 2.7))));
+    YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrScale(VecSet1(0.007)), MatrRotateY(180)));
+    YR4_RndPrimDraw(&Pr2, MatrMulMatr(MatrRotateY(110), MatrTranslate(VecSet(-4, 7, 0))));
+    YR4_RndPrimDraw(&Pr3, MatrMulMatr4(MatrScale(VecSet1(0.07)), MatrRotateX(270), MatrRotateY(t * 20 / 1000.0), MatrTranslate(VecSet(-1, 0, 6))));
+    YR4_RndPrimDraw(&Pr4, MatrMulMatr3(MatrScale(VecSet1(0.016)), MatrTranslate(VecSet(5, fabs(sin(t * 2 / 500.0)) * 2 - 3, -12)), MatrRotateY(-t * 30 / 500.0),));
+    YR4_RndPrimDraw(&Pr5, MatrMulMatr(MatrTranslate(VecSet(-3, 0, -15)), MatrRotateY(60)));
     YR4_RndEnd();
 
     hDC = GetDC(hWnd);
