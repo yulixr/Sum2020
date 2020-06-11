@@ -21,6 +21,27 @@
 typedef double DBL;
 typedef double FLT;
 
+/* Random numbers functions */
+
+/* Obtain random number in [0..1] range
+ * ARGUMENTS: none
+ * RETURNS:
+ *    DBL value
+ */
+__inline DBL Rand0( VOID )
+{
+  return rand() / (DBL)RAND_MAX;
+} /* end of rand0 func */
+/* Obtain random number in [-1..1] range
+ * ARGUMENTS: none
+ * RETURNS:
+ *    DBL value
+ */
+__inline DBL Rand1( VOID)
+{
+  return 2.0 * rand() / RAND_MAX - 1;
+} /* end of rand1 func */
+
 /* Vector structure */
 typedef struct tagVEC
 {

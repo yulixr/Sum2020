@@ -24,7 +24,7 @@ BOOL YR4_RndPrimCreate( yr4PRIM *Pr, INT NoofV, INT NoofI )
   memset(Pr, 0, sizeof(yr4PRIM));
 
   size = sizeof(yr4VERTEX) * NoofV + sizeof(INT) * NoofI;
-  
+
   Pr->V = malloc(size);
   if (Pr->V == NULL)
     return FALSE;
@@ -186,6 +186,7 @@ BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT Sp
 } /* end of 'YR4_RndPrimCreateThor' func */
 
 #include <stdio.h>
+
 /* Load model.
  * ARGUMENTS:
  *   -Prim structure:

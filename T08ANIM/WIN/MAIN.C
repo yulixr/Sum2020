@@ -5,13 +5,11 @@
  *          WinAPI startup module.
  */
 
-#include <time.h>
-
-#include "../def.h"
-#include "../anim/rnd/rnd.h"
+#include "../units.h"
 
 #define WND_CLASS_NAME "My Class Name"
 
+INT YR4_MouseWheel;
 /* Forward declaration */
 LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
@@ -33,6 +31,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   HWND hWnd;
   MSG msg;
   WNDCLASS wc;
+  INT i;
 
   SetDbgMemHooks();
 
@@ -61,6 +60,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     NULL, NULL, hInstance, NULL);
 
   ShowWindow(hWnd, CmdShow);
+
+  for(i = 0; i < 9; i++)
+    YR4_AnimAddUnit(YR4_UnitCreateBall());
+  YR4_AnimAddUnit(YR4_UnitCreateCow());
+  YR4_AnimAddUnit(YR4_UnitCreateCtrl());
+  
   
   /* Message loop */
   while (TRUE)
@@ -81,14 +86,6 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   PAINTSTRUCT ps;
   HDC hDC;
-  static yr4PRIM Pr;
-  static yr4PRIM Pr1;
-  static yr4PRIM Pr2;
-  static yr4PRIM Pr3;
-  static yr4PRIM Pr4;
-  static yr4PRIM Pr5;
-  LONG t = clock();
-  
 
   switch(Msg)
   {
@@ -97,7 +94,9 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       GetSystemMetrics(SM_CYMAXTRACK) + GetSystemMetrics(SM_CYCAPTION) + 2 * GetSystemMetrics(SM_CYBORDER);
     return 0;
   case WM_CREATE:
-    YR4_RndInit(hWnd);
+    YR4_AnimInit(hWnd);
+    
+    /*YR4_RndInit(hWnd);
     YR4_RndCamSet(VecSet(0, 15, 26), VecSet(0, 0, 0), VecSet(0, 1, 0));
     SetTimer(hWnd, 30, 60, NULL);
 
@@ -106,40 +105,51 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     YR4_RndPrimLoad(&Pr2, "notebook.obj");
     YR4_RndPrimLoad(&Pr3, "chair.obj");
     YR4_RndPrimLoad(&Pr4, "cat.obj");
-    YR4_RndPrimLoad(&Pr5, "Door.obj");
-    //YR4_RndPrimCreateThor(&Pr1, VecSet(0, 0, 0), 7, 3, 38, 19);
+    YR4_RndPrimLoad(&Pr5, "Door.obj"); */
     
     return 0;
   case WM_SIZE:
     /* Obtain new window width and height */
-    YR4_RndResize(LOWORD(lParam), HIWORD(lParam));
+    YR4_AnimResize(LOWORD(lParam), HIWORD(lParam));
 
     SendMessage(hWnd, WM_TIMER, 47, 0);
     return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
+    else if (wParam == 'F')
+      YR4_AnimFlipFullScreen(hWnd);
     return 0;
   case WM_TIMER:
-    YR4_RndStart();
+    /*YR4_RndStart();
     YR4_RndPrimDraw(&Pr, MatrMulMatr(MatrRotateY(30 * t / 2000.0), MatrTranslate(VecSet(3, 3 + sin(5 * t / 2000.0) / 1.5, 2.7))));
     YR4_RndPrimDraw(&Pr1, MatrMulMatr(MatrScale(VecSet1(0.007)), MatrRotateY(180)));
     YR4_RndPrimDraw(&Pr2, MatrMulMatr(MatrRotateY(110), MatrTranslate(VecSet(-4, 7, 0))));
     YR4_RndPrimDraw(&Pr3, MatrMulMatr4(MatrScale(VecSet1(0.07)), MatrRotateX(270), MatrRotateY(t * 20 / 1000.0), MatrTranslate(VecSet(-1, 0, 6))));
-    YR4_RndPrimDraw(&Pr4, MatrMulMatr3(MatrScale(VecSet1(0.016)), MatrTranslate(VecSet(5, fabs(sin(t * 2 / 500.0)) * 2 - 3, -12)), MatrRotateY(-t * 30 / 500.0),));
-    YR4_RndPrimDraw(&Pr5, MatrMulMatr(MatrTranslate(VecSet(-3, 0, -15)), MatrRotateY(60)));
-    YR4_RndEnd();
+    YR4_RndPrimDraw(&Pr4, MatrMulMatr3(MatrScale(VecSet1(0.016)), MatrTranslate(VecSet(5, fabs(sin(t * 2 / 500.0)) * 2 - 3, -12)), MatrRotateY(-t * 30 / 500.0)));
+    YR4_RndPrimDraw(&Pr5, MatrMulMatr(MatrTranslate(VecSet(-3, 0, -15)), MatrRotateY(60))); 
+    YR4_RndEnd();*/
+    YR4_AnimRender();
 
-    hDC = GetDC(hWnd);
-    YR4_RndCopyFrame(hDC);
-    ReleaseDC(hWnd, hDC);
-    //InvalidateRect(hWnd, NULL, FALSE);
+    /*hDC = GetDC(hWnd);
+    YR4_AnimCopyFrame(hDC);
+    ReleaseDC(hWnd, hDC);*/
+    InvalidateRect(hWnd, NULL, FALSE);
     return 0;
   case WM_ERASEBKGND:
     return 1;
+  case WM_LBUTTONDOWN:
+    SetCapture(hWnd);
+    return 0;
+  case WM_LBUTTONUP:
+    ReleaseCapture();
+    return 0;
+  case WM_MOUSEWHEEL:
+    YR4_MouseWheel += (SHORT)HIWORD(wParam);
+    return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
-    YR4_RndCopyFrame(hDC);
+    YR4_AnimCopyFrame(hDC);
     EndPaint(hWnd, &ps);
     return 0;
   case WM_CLOSE:
@@ -148,13 +158,7 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       DestroyWindow(hWnd);
     return 0;
   case WM_DESTROY:
-    YR4_RndPrimFree(&Pr);
-    YR4_RndPrimFree(&Pr1);
-    YR4_RndPrimFree(&Pr2);
-    YR4_RndPrimFree(&Pr3);
-    YR4_RndPrimFree(&Pr4);
-    YR4_RndPrimFree(&Pr5);
-    YR4_RndClose();
+    YR4_AnimClose();
     KillTimer(hWnd, 30);
     PostMessage(hWnd, WM_QUIT, 0, 0);
     return 0;

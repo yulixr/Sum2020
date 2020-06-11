@@ -182,6 +182,10 @@
 				RelativePath=".\DEF.H"
 				>
 			</File>
+			<File
+				RelativePath=".\UNITS.H"
+				>
+			</File>
 			<Filter
 				Name="Math Support"
 				>
@@ -194,11 +198,23 @@
 				Name="Animation System"
 				>
 				<File
+					RelativePath=".\ANIM\ANIM.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\ANIM.H"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\INPUT.C"
+					>
+				</File>
+				<File
 					RelativePath=".\ANIM\TIMER.C"
 					>
 				</File>
 				<File
-					RelativePath=".\ANIM\TIMER.H"
+					RelativePath=".\ANIM\UNIT.C"
 					>
 				</File>
 				<Filter
@@ -227,6 +243,22 @@
 				>
 				<File
 					RelativePath=".\WIN\MAIN.C"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Units"
+				>
+				<File
+					RelativePath=".\UNITS\U_BBALL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_COW.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_CTRL.C"
 					>
 				</File>
 			</Filter>

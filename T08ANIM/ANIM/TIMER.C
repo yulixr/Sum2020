@@ -1,43 +1,61 @@
-/* YR4, 04.06.2020 */
+/* FILE NAME: TIMER.C
+ * PROGRAMMER: YR4
+ * DATE: 09.06.2020
+ * PURPOSE: 3D animation project.
+ *          Timer implementation.
+ */
 
-#include "TIMER.H"  
+#include "anim.h"
 
-static LONG StartTime, OldTime, PauseTime, OldFPSTime, FrameCount;
-DOUBLE GLB_Time;
-DOUBLE GLB_DeltaTime;
-DOUBLE GLB_FPS;
-BOOL GLB_IsPause;
+static UINT64
+    StartTime, 
+    OldTime, 
+    PauseTime, 
+    OldFPSTime,
+    TimePerSec,
+    FrameCount;
 
-VOID GLB_TimerInit( VOID )
+VOID YR4_TimerInit( VOID )
 {
-  StartTime = OldTime = OldFPSTime = clock();
-  PauseTime = 0;
+  LARGE_INTEGER t;
+
+  QueryPerformanceFrequency(&t);
+  TimePerSec = t.QuadPart;
+  QueryPerformanceCounter(&t);
+  StartTime = OldTime = OldFPSTime = t.QuadPart;
   FrameCount = 0;
-  GLB_IsPause = FALSE;
+  YR4_Anim.IsPause = FALSE;
+  YR4_Anim.FPS = 30.0;
+  PauseTime = 0;
 }
 
-VOID GLB_TimerResponse( VOID )
+VOID YR4_TimerResponse( VOID )
 {
-  LONG t = clock();
+  LARGE_INTEGER t;
+  QueryPerformanceCounter(&t);
 
-  if (!GLB_IsPause)
+  YR4_Anim.GlobalTime = (DBL)(t.QuadPart - StartTime) / TimePerSec;
+  YR4_Anim.GlobalDeltaTime = (DBL)(t.QuadPart - OldTime) / TimePerSec;
+
+  /* Time with pause */
+  if (YR4_Anim.IsPause)
   {
-    GLB_Time = (DOUBLE)(t - PauseTime - StartTime) / CLOCKS_PER_SEC;
-    GLB_DeltaTime = (DOUBLE)(t - OldTime) / CLOCKS_PER_SEC;
+    YR4_Anim.DeltaTime = 0;
+    PauseTime += t.QuadPart - OldTime;
   }
   else
   {
-    PauseTime += t - OldTime;
-    GLB_DeltaTime = 0;
+    YR4_Anim.DeltaTime = YR4_Anim.GlobalDeltaTime;
+    YR4_Anim.Time = (DBL)(t.QuadPart - PauseTime - StartTime) / TimePerSec;
   }
-
+  /* FPS */
   FrameCount++;
-
-  if (t - OldFPSTime > CLOCKS_PER_SEC)
+  if (t.QuadPart - OldFPSTime > TimePerSec)
   {
-    GLB_FPS = FrameCount / ((DOUBLE)(t - OldFPSTime) / CLOCKS_PER_SEC);
-    OldFPSTime = t;
+    YR4_Anim.FPS = FrameCount * TimePerSec / (DBL)(t.QuadPart - OldFPSTime);
+    OldFPSTime = t.QuadPart;
     FrameCount = 0;
   }
-  OldTime = t;
+  OldTime = t.QuadPart;
 }
+/* END OF "TIMER.C" FILE */
