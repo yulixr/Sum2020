@@ -31,16 +31,17 @@ extern HGLRC YR4_hRndGLRC;
 typedef struct tagyr4VERTEX
 {
   VEC P; /* Vertex position */
+  VEC2 T; /* Vertex texture coord */
+  VEC N; /* Vertex normal coord */
+  VEC4 C; /* Vertex color */
 } yr4VERTEX;
 
 typedef struct tagyr4PRIM
 {
-  yr4VERTEX *V; /* Vertex attributes array */
-  INT NumOfV; /* Number of vericles */
-
-  INT *I; /* Index array */
-  INT NumOfI; /* Number of indices */
-
+  INT
+    VA, VBuf,  /* Opengl vertex array and buffer */
+    Ibuf;      /* Opengl index buffer */  
+  INT NumOfElements; /* Number of elements vericles */
   MATR Trans; /* Additional transformation matrix */
 } yr4PRIM;
 
@@ -57,7 +58,7 @@ VOID YR4_RndCamSet(VEC Loc, VEC At, VEC Up1);
 VOID YR4_RndProjSet( VOID );
 
 VOID YR4_RndPrimFree( yr4PRIM *Pr );
-BOOL YR4_RndPrimCreate( yr4PRIM *Pr, INT NoofV, INT NoofI );
+VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI );
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World );
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
 BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH );

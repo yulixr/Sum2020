@@ -103,6 +103,7 @@ static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  glLoadMatrixf(m.M[0]);
  glRasterPos2d(5 , 50);
  glListBase(102);
+ glColor3d(0.01, 0.14, 0.21);
  glCallLists(n, GL_UNSIGNED_BYTE, Buf);
 } /* End of 'YR4_UnitRender' function */
 

@@ -110,9 +110,6 @@ VOID YR4_RndCamSet( VEC Loc, VEC At, VEC Up )
 VOID YR4_RndStart( VOID )
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //SelectObject(YR4_hRndDC, GetStockObject(NULL_BRUSH));
-  //SelectObject(YR4_hRndDC, GetStockObject(BLACK_PEN));
 } /* End of 'YR4_RndStart' function */
 
 VOID YR4_RndEnd( VOID )

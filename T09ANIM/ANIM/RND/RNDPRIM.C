@@ -12,31 +12,67 @@
  * ARGUMENTS:
  *   -Prim structure:
  *       yr4PRIM *Pr;
- *   -Number of verticles and indicies:
+ *   -vertex array:
+ *      yr4VERTEX *V;
+ *   -index array:
+ *      INT *I;
+ *   -Vertex and index arrays size:
  *       INT NoofV, NoofI;
  * RETURNS:
- *   BOOL.
+ *   VOID.
  */
-BOOL YR4_RndPrimCreate( yr4PRIM *Pr, INT NoofV, INT NoofI )
+VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI )
 {
-  INT size;
-
   memset(Pr, 0, sizeof(yr4PRIM));
 
-  size = sizeof(yr4VERTEX) * NoofV + sizeof(INT) * NoofI;
+  if (V != NULL)
+  {
+    glGenBuffers(1, &Pr->VBuf);
+    glGenVertexArrays(1, &Pr->VA);
 
-  Pr->V = malloc(size);
-  if (Pr->V == NULL)
-    return FALSE;
+    /* active vertex array */
+    glBindVertexArray(Pr->VA);
 
-  memset(Pr->V, 0, size);
-  Pr->I = (INT *)(Pr->V + NoofV);
+    /* active vertex buffer */
+    glBindBuffer(GL_ARRAY_BUFFER, Pr->VBuf);
 
-  Pr->NumOfV = NoofV;
-  Pr->NumOfI = NoofI;
+    /* fill data */
+    glBufferData(GL_ARRAY_BUFFER, sizeof(yr4VERTEX) * NoofV, V, GL_STATIC_DRAW);
+    
+    /* set data order */
+    glVertexAttribPointer(0, 3, GL_FLOAT, FALSE, sizeof(yr4VERTEX),
+                        (VOID *)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, FALSE, sizeof(yr4VERTEX),
+                        (VOID *)(sizeof(VEC)));
+    glVertexAttribPointer(2, 3, GL_FLOAT, FALSE, sizeof(yr4VERTEX),
+                        (VOID *)(sizeof(VEC) + sizeof(VEC2)));
+    glVertexAttribPointer(3, 4, GL_FLOAT, FALSE, sizeof(yr4VERTEX),
+                        (VOID *)(sizeof(VEC) * 2 + sizeof(VEC2)));
+  
+    /* enable layouts */
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
 
+    /* disable vertex array */
+    glBindVertexArray(0);
+  }
+
+  if (I != 0)
+  {
+    glGenBuffers(1, &Pr->Ibuf);
+    /* active index buffer */
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->Ibuf);
+
+    /* fill data */
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INT) * NoofI, I, GL_STATIC_DRAW);
+    
+    Pr->NumOfElements = NoofI;
+  }
+  else
+    Pr->NumOfElements = NoofV;
   Pr->Trans = MatrIdentity();
-  return TRUE;
 } /* end of YR4_RndPrimCreate func */
 
 /* Free Prim structure.
@@ -48,8 +84,16 @@ BOOL YR4_RndPrimCreate( yr4PRIM *Pr, INT NoofV, INT NoofI )
  */
 VOID YR4_RndPrimFree( yr4PRIM *Pr )
 {
-  if (Pr->V != NULL)
-    free(Pr->V);
+  if (Pr->VA != 0)
+  {
+    glBindVertexArray(Pr->VA);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDeleteBuffers(1, &Pr->VBuf);
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &Pr->VA);
+  }
+  if (Pr->Ibuf != 0)
+    glDeleteBuffers(1, &Pr->Ibuf);
   memset(Pr, 0, sizeof(yr4PRIM));
 } /* end of YR4_RndPrimFree func */
 
@@ -64,19 +108,24 @@ VOID YR4_RndPrimFree( yr4PRIM *Pr )
  */
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
 {
-  INT i;
   MATR M = MatrMulMatr3(Pr->Trans, World, YR4_RndMatrVP);
 
   glLoadMatrixf(M.M[0]);
 
   /* Draw all triangles */
-  glBegin(GL_TRIANGLES);
-  for (i = 0; i < Pr->NumOfI; i ++) 
+  if (Pr->Ibuf != 0)
   {
-    glColor3d(0.6, 0.6,0.9);
-    glVertex3fv(&Pr->V[Pr->I[i]].P.X);
+    glBindVertexArray(Pr->VA);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->Ibuf);
+    glDrawElements(GL_TRIANGLES, Pr->NumOfElements, GL_UNSIGNED_INT, NULL);
+    glBindVertexArray(0);
   }
-  glEnd();
+  else
+  {
+    glBindVertexArray(Pr->VA);
+    glDrawArrays(GL_TRIANGLES, 0, Pr->NumOfElements);
+    glBindVertexArray(0);
+  }
 } /* End of 'YR4_RndPrimDraw' function */
 
 /* Create sphere prim structure.
@@ -94,29 +143,40 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
  */
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
 {
-  INT i, j, m, n;
+  INT i, j, m, n, noofv, noofi, size;
   DOUBLE t, p;
+  yr4VERTEX *V;
+  INT *Ind;
 
-  if(!YR4_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * 2 * (SplitH - 1) * 3))
+  memset(Pr, 0, sizeof(yr4PRIM));
+
+  noofv = SplitW * SplitH;
+  noofi = (SplitW - 1) * 2 * (SplitH - 1) * 3; 
+  size = sizeof(yr4VERTEX) * noofv + sizeof(INT) * noofi;
+
+  if ((V = malloc(size)) == NULL)
     return FALSE;
+  Ind = (INT *)(V + noofv);
 
   for (i = 0, t = 0, m = 0; i < SplitH; i++, t += PI / (SplitH - 1))
     for (j = 0, p = 0; j < SplitW; j++, p += 2 * PI / (SplitW - 1))
-       Pr->V[m++].P = (VecSet(C.X + R * cos(p) * sin(t),
+       V[m++].P = (VecSet(C.X + R * cos(p) * sin(t),
                               C.Y + R * cos(t),
                               C.Z + R * sin(p) * sin(t)));
 
   for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
     for (j = 0; j < SplitW - 1; j++, m++)
     {
-      Pr->I[n++] = m;
-      Pr->I[n++] = m + 1;
-      Pr->I[n++] = m + SplitW;
+      Ind[n++] = m;
+      Ind[n++] = m + 1;
+      Ind[n++] = m + SplitW;
 
-      Pr->I[n++] = m + SplitW;
-      Pr->I[n++] = m + 1;
-      Pr->I[n++] = m + SplitW + 1;
+      Ind[n++] = m + SplitW;
+      Ind[n++] = m + 1;
+      Ind[n++] = m + SplitW + 1;
     }
+  YR4_RndPrimCreate(Pr, V, noofv, Ind, noofi);
+  free(V);
   return TRUE;
 } /* end of 'YR4_RndPrimCreateSphere' func */
 
@@ -135,29 +195,40 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
  */
 BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH )
 {
-  INT i, j, m, n;
+  INT i, j, m, n, noofv, noofi, size;
   DOUBLE t, p;
+  yr4VERTEX *V;
+  INT *Ind;
 
-  if(!YR4_RndPrimCreate(Pr, SplitW * SplitH, (SplitW - 1) * 2 * (SplitH - 1) * 3))
+  memset(Pr, 0, sizeof(yr4PRIM));
+
+  noofv = SplitW * SplitH;
+  noofi = (SplitW - 1) * 2 * (SplitH - 1) * 3; 
+  size = sizeof(yr4VERTEX) * noofv + sizeof(INT) * noofi;
+
+  if ((V = malloc(size)) == NULL)
     return FALSE;
+  Ind = (INT *)(V + noofv);
 
   for (i = 0, t = -PI, m = 0; i < SplitH; i++, t += 2 * PI / (SplitH - 1))
     for (j = 0, p = 0; j < SplitW; j++, p += 2 * PI / (SplitW - 1))
-       Pr->V[m++].P = (VecSet(C.X + (R + r * cos(t)) * cos(p),
+       V[m++].P = (VecSet(C.X + (R + r * cos(t)) * cos(p),
                               C.Y + r * sin(t),
                               C.Z + (R + r * cos(t)) * sin(p)));
 
   for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
     for (j = 0; j < SplitW - 1; j++, m++)
     {
-      Pr->I[n++] = m;
-      Pr->I[n++] = m + 1;
-      Pr->I[n++] = m + SplitW;
+      Ind[n++] = m;
+      Ind[n++] = m + 1;
+      Ind[n++] = m + SplitW;
 
-      Pr->I[n++] = m + SplitW;
-      Pr->I[n++] = m + 1;
-      Pr->I[n++] = m + SplitW + 1;
+      Ind[n++] = m + SplitW;
+      Ind[n++] = m + 1;
+      Ind[n++] = m + SplitW + 1;
     }
+  YR4_RndPrimCreate(Pr, V, noofv, Ind, noofi);
+  free(V);
   return TRUE;
 } /* end of 'YR4_RndPrimCreateThor' func */
 
@@ -176,7 +247,9 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
 {
   FILE *F;
   static CHAR Buf[1000];
-  INT nv = 0, nf = 0;
+  yr4VERTEX *V;
+  INT *Ind;
+  INT nv = 0, nf = 0, size;
   
   memset(Pr, 0, sizeof(yr4PRIM));
 
@@ -189,13 +262,18 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
       nv++;
     else if (Buf[0] == 'f' && Buf[1] == ' ')
       nf++;
+  
+  size = sizeof(yr4VERTEX) * nv + sizeof(INT) * (nf * 3);
 
-  if (!YR4_RndPrimCreate(Pr, nv, nf * 3))
+  if ((V = malloc(size)) == NULL)
   {
     fclose(F);
     return FALSE;
   }
-  
+
+  memset(V, 0, size);
+  Ind = (INT *)(V + nv);
+
   /* Load geometry data */
   rewind(F);
   nv = nf = 0;
@@ -204,7 +282,7 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
     {
       DBL x, y, z;
       sscanf(Buf + 2, "%lf %lf %lf", &x, &y, &z);
-      Pr->V[nv++].P = VecSet(x, y, z);
+      V[nv++].P = VecSet(x, y, z);
     }
     else if (Buf[0] == 'f' && Buf[1] == ' ')
     {
@@ -215,12 +293,14 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
       sscanf(Buf + 2, "%d//%*d %d//%*d %d//%*d", &n1, &n2, &n3) == 3 ||
       sscanf(Buf + 2, "%d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &n1, &n2, &n3) == 3;
 
-      Pr->I[nf++] = n1 - 1;
-      Pr->I[nf++] = n2 - 1;
-      Pr->I[nf++] = n3 - 1;
+      Ind[nf++] = n1 - 1;
+      Ind[nf++] = n2 - 1;
+      Ind[nf++] = n3 - 1;
     }
 
   fclose(F);
+  YR4_RndPrimCreate(Pr, V, nv, Ind, nf);
+  free(V);
   return TRUE;
 } /* end of 'YR4_RndPrimLoad' func */
 
