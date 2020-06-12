@@ -109,7 +109,6 @@ LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
-   // YR4_AnimCopyFrame();
     EndPaint(hWnd, &ps);
     return 0;
   case WM_KEYDOWN:

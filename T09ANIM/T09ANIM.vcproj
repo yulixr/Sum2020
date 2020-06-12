@@ -244,6 +244,10 @@
 						RelativePath=".\ANIM\RND\RNDPRIM.C"
 						>
 					</File>
+					<File
+						RelativePath=".\ANIM\RND\RNDSHD.C"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter

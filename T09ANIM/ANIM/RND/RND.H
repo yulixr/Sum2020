@@ -27,6 +27,7 @@ extern HWND YR4_hRndWnd;
 extern HDC YR4_hRndDC;
 extern INT YR4_RndFrameW, YR4_RndFrameH;
 extern HGLRC YR4_hRndGLRC;
+extern INT YR4_RndProgId; /* global shader id for checking */
 
 typedef struct tagyr4VERTEX
 {
@@ -36,8 +37,17 @@ typedef struct tagyr4VERTEX
   VEC4 C; /* Vertex color */
 } yr4VERTEX;
 
+typedef enum tagyr4PRIM_TYPE
+{
+  YR4_RND_PRIM_TRIMESH, /* Array of triangles */
+  YR4_RND_PRIM_TRISTRIP, /* Array of stripped triangles */
+  YR4_RND_PRIM_LINES,
+  YR4_RND_PRIM_POINTS, /* Array of points */
+} yr4PRIM_TYPE;
+
 typedef struct tagyr4PRIM
 {
+  yr4PRIM_TYPE Type;
   INT
     VA, VBuf,  /* Opengl vertex array and buffer */
     Ibuf;      /* Opengl index buffer */  
@@ -58,11 +68,16 @@ VOID YR4_RndCamSet(VEC Loc, VEC At, VEC Up1);
 VOID YR4_RndProjSet( VOID );
 
 VOID YR4_RndPrimFree( yr4PRIM *Pr );
-VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI );
+VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI, yr4PRIM_TYPE Type );
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World );
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH );
 BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH );
 BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName );
+BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL IsNormalsNeed );
+
+/******** shader handle ************/
+INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix );
+VOID YR4_RndShdDelete( INT ProgId );
 
 #endif
 /* END OF 'RND.H' FILE */

@@ -53,7 +53,7 @@ static VOID YR4_UnitResponse( yr4UNIT_BALL *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitRender( yr4UNIT_BALL *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimDraw(&Uni->Ball, MatrMulMatr3(MatrTranslate(Uni->Pos), 
-    MatrTranslate(VecSet(0, sin(3 * Ani->Time), 0)), 
+    MatrTranslate(VecSet(0, 0 * sin(3 * Ani->Time), 0)), 
     MatrScale(VecSet1(Uni->Scale))));
 } /* End of 'YR4_UnitRender' function */
 

@@ -64,7 +64,7 @@ static VOID YR4_UnitRender( yr4UNIT_COW *Uni, yr4ANIM *Ani )
 {
   MATR m;
 
-  m = MatrMulMatr3(MatrScale(VecSet1(0.4)),
+  m = MatrMulMatr3(MatrScale(VecSet1(0.3)),
                    MatrTranslate(VecSet(-3, 0, 0)),
                    MatrRotateY(-90));
   YR4_RndPrimDraw(&Uni->Cow, m);

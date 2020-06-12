@@ -1,11 +1,12 @@
 /* FILE NAME: RNDBASE.C
  * PROGRAMMER: YR4
- * DATE: 06.06.2020
+ * DATE: 11.06.2020
  * PURPOSE: 3D animation project.
  *          Base functions.
  */
 
 #include "rnd.h"
+#include <time.h>
 
 /* link lib */
 #pragma comment(lib, "opengl32")
@@ -54,11 +55,16 @@ VOID YR4_RndInit( HWND hWnd )
   glClearColor(0.30, 0.47, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
 
+  glEnable(GL_PRIMITIVE_RESTART);
+  glPrimitiveRestartIndex(-1);
+
   YR4_RndFrameH = 100;
   YR4_RndFrameW = 100;
 
   YR4_RndProjSize = YR4_RndProjDist = 0.1;
   YR4_RndProjFarClip = 30;
+
+  YR4_RndProgId = YR4_RndShdLoad("DEFAULT");
 } /* End 'YR4_RndInit' function */
 
 /* Close function.
@@ -69,6 +75,8 @@ VOID YR4_RndInit( HWND hWnd )
  */
 VOID YR4_RndClose( VOID )
 {
+  YR4_RndShdDelete(YR4_RndProgId);
+
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(YR4_hRndGLRC);
   
@@ -109,6 +117,15 @@ VOID YR4_RndCamSet( VEC Loc, VEC At, VEC Up )
  */
 VOID YR4_RndStart( VOID )
 {
+  INT t;
+  static INT reload_time;
+
+  if ((t = clock()) - reload_time > 2 * CLOCKS_PER_SEC)
+  {
+    YR4_RndShdDelete(YR4_RndProgId);
+    YR4_RndProgId = YR4_RndShdLoad("DEFAULT");
+    reload_time = t;
+  }
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } /* End of 'YR4_RndStart' function */
 

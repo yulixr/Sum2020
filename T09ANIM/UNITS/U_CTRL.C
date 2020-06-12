@@ -11,9 +11,12 @@
 typedef struct
 {
   YR4_UNIT_BASE_FIELDS;
-  INT Speed;
-  DBL AngleSpeed;
-  VEC CamLoc;
+  DBL
+    Dist, /* camera distance from origin */
+    Elevator, /* Elevator angle */
+    Azimuth; /* Azimuth angle */
+
+  yr4PRIM Axes;
 } yr4UNIT_CTRL;
 
 /* Unit initialization function.
@@ -27,9 +30,21 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 {
   HFONT hFnt, hFntOld;
-  Uni->Speed = 6;
-  Uni->AngleSpeed = 20;
-  Uni->CamLoc = VecSet(0, 8, 8);
+  yr4VERTEX V[] = 
+  {
+    {{0, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
+    {{300, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
+    {{0, 0, 0}, {0, 0}, {0, 0, 0}, {0, 1, 0, 1}},
+    {{0, 300, 0}, {0, 0}, {0, 0, 0}, {0, 1, 0, 1}},
+    {{0, 0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 1, 1}},
+    {{0, 0, 300}, {0, 0}, {0, 0, 0}, {0, 0, 1, 1}}
+  };
+  YR4_RndPrimCreate(&Uni->Axes, V, 6, NULL, 0, YR4_RND_PRIM_LINES);
+
+  Uni->Azimuth = 20;
+  Uni->Elevator = 1;
+  Uni->Dist = 8;
+  //Uni->CamLoc = VecSet(0, 8, 8);
   hFnt = CreateFont(50, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, RUSSIAN_CHARSET, 
       OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_MODERN | VARIABLE_PITCH, "Mistral"); 
 
@@ -68,21 +83,16 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   if (Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  Uni->CamLoc = VecAddVec(Uni->CamLoc, 
-    VecMulNum(VecNormalize(VecSubVec(VecSet(0, 0, 0), Uni->CamLoc)),
-    Ani->GlobalDeltaTime * (Uni->Speed / 1.8) * Ani->Mdz));
+  Uni->Dist += Ani->GlobalDeltaTime * (-2 * Ani->Mdz + 8 * (Ani->Keys[VK_PRIOR] - Ani->Keys[VK_NEXT]));
 
-  Uni->CamLoc = 
-    VecAddVec(Uni->CamLoc, VecMulNum(VecNormalize(VecSubVec(VecSet(0, 0, 0), Uni->CamLoc)), Ani->GlobalDeltaTime * Uni->Speed *
-    (Ani->Keys[VK_UP] - Ani->Keys[VK_DOWN])));
-  
-  Uni->CamLoc = 
-    VecAddVec(Uni->CamLoc, VecMulNum(VecSet(1, 0, 0), Ani->GlobalDeltaTime * Uni->Speed *
-    (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT])));
-  
-  Uni->CamLoc = PointTransform(Uni->CamLoc, 
-    MatrRotateY(Ani->Keys[VK_LBUTTON] * Ani->GlobalDeltaTime * Uni->AngleSpeed * Ani->Mdx)); 
-  YR4_RndCamSet(Uni->CamLoc, VecSet(0, 0, 0), VecSet(0, 1, 0));
+  Uni->Azimuth += Ani->GlobalDeltaTime * (30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 35 * (-(Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT])));
+
+  Uni->Elevator += Ani->GlobalDeltaTime * (Ani->Keys[VK_LBUTTON] * 30 * Ani->Mdy + 35 * (-(Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP])));
+
+  YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
+                  MatrMulMatr(MatrRotateX(Uni->Elevator),
+                              MatrRotateY(Uni->Azimuth))),
+    VecSet(0, 0, 0), VecSet(0, 1, 0));
 } /* End of 'YR4_UnitResponse' function */
 
 /* Unit render function.
@@ -99,12 +109,16 @@ static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   static CHAR Buf[100];
   MATR m = MatrOrtho(0, Ani->W - 1, Ani->H - 1, 0, -1, 1);
   n = sprintf(Buf, "FPS: %.3f", YR4_Anim.FPS);
+  
+  glLineWidth(4);
+  YR4_RndPrimDraw(&Uni->Axes, MatrIdentity());
+  glLineWidth(1);
 
- glLoadMatrixf(m.M[0]);
- glRasterPos2d(5 , 50);
- glListBase(102);
- glColor3d(0.01, 0.14, 0.21);
- glCallLists(n, GL_UNSIGNED_BYTE, Buf);
+  glLoadMatrixf(m.M[0]);
+  glRasterPos2d(5 , 50);
+  glListBase(102);
+  glColor3d(0.01, 0.14, 0.21);
+  glCallLists(n, GL_UNSIGNED_BYTE, Buf);
 } /* End of 'YR4_UnitRender' function */
 
 /* Text unit creation function.
