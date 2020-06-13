@@ -6,7 +6,6 @@
  */
 
 #include "../units.h"
-
 /* Cow unit type */
 typedef struct
 {
@@ -63,7 +62,7 @@ static VOID YR4_UnitResponse( yr4UNIT_COW *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitRender( yr4UNIT_COW *Uni, yr4ANIM *Ani )
 {
   MATR m;
-
+  
   m = MatrMulMatr3(MatrScale(VecSet1(0.3)),
                    MatrTranslate(VecSet(-3, 0, 0)),
                    MatrRotateY(-90));

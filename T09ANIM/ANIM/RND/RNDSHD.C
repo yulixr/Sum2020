@@ -60,7 +60,11 @@ static VOID YR4_RndShdLog( CHAR *Prefix, CHAR *PartName, CHAR *Text )
   fclose(F);
 } /* end of YR4_RndShdLog func */
 
-/*
+/* Load shaders func
+ * ARGUMENTS:
+ *    -Shader prefix name:
+ *       CHAR *ShaderFileNamePrefix
+ * RETURNS: INT.
  */
 INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix )
 {
@@ -158,7 +162,12 @@ INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix )
   return prg;
 } /* end of YR4_RndShdLoad func */
 
-/**/
+/* Delete shaders func
+ * ARGUMENTS:
+ *    -Programm id:
+ *         INT ProgId.
+ * RETURNS: none.
+ */
 VOID YR4_RndShdDelete( INT ProgId )
 {
   INT shdrs[5], n, i;
@@ -173,6 +182,6 @@ VOID YR4_RndShdDelete( INT ProgId )
     glDeleteShader(shdrs[i]);
   }
   glDeleteProgram(ProgId);
-}
+} /* end of YR4_RndShdDelete func */
 
 /* END OF 'RNDSHD.C' FILE */ 

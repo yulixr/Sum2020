@@ -162,20 +162,17 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
  */
 BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH )
 {
-  INT i, j, m, n, noofv, noofi, size;
+  INT i, j, m, noofv, size;
   DOUBLE t, p;
   yr4VERTEX *V;
-  INT *Ind;
 
   memset(Pr, 0, sizeof(yr4PRIM));
 
   noofv = SplitW * SplitH;
-  noofi = (SplitW - 1) * 2 * (SplitH - 1) * 3; 
-  size = sizeof(yr4VERTEX) * noofv + sizeof(INT) * noofi;
+  size = sizeof(yr4VERTEX) * noofv;
 
   if ((V = malloc(size)) == NULL)
     return FALSE;
-  Ind = (INT *)(V + noofv);
 
   for (i = 0, t = 0, m = 0; i < SplitH; i++, t += PI / (SplitH - 1))
     for (j = 0, p = 0; j < SplitW; j++, p += 2 * PI / (SplitW - 1))
@@ -195,18 +192,7 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
        m++;
     }
 
-  for (i = 0, m = 0, n = 0; i < SplitH - 1; i++, m++)
-    for (j = 0; j < SplitW - 1; j++, m++)
-    {
-      Ind[n++] = m;
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + 1;
-
-      Ind[n++] = m + SplitW;
-      Ind[n++] = m + SplitW + 1;
-      Ind[n++] = m + 1;
-    }
-  YR4_RndPrimCreate(Pr, V, noofv, Ind, noofi, YR4_RND_PRIM_TRIMESH);
+  YR4_RndPrimCreateFromGrid(Pr, V, SplitW, SplitH, FALSE);
   free(V);
   return TRUE;
 } /* end of 'YR4_RndPrimCreateSphere' func */
@@ -369,14 +355,14 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
  */
 BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL IsNormalsNeed )
 {
-  INT *Ind;
   INT i, j, k;
+  INT *Ind;
 
   memset(Pr, 0, sizeof(yr4PRIM));
   if ((Ind = malloc(((2 * W + 1) * (H - 1) - 1) * sizeof(INT))) == NULL)
     return FALSE;
 
-  for (i = 0, k = 0; i < H; i++)
+  for (i = 0, k = 0; i < H - 1; i++)
   {
     for (j = 0; j < W; j++)
     {
@@ -391,11 +377,11 @@ BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL Is
   {
     for (i = 0; i < W * H; i++)
       V[i].N = VecSet(0, 0, 0);
-
     for (i = 0; i < H - 1; i++)
       for (j = 0; j < W - 1; j++)
       {
-        yr4VERTEX *P00 = V + i * W + j,
+        yr4VERTEX
+          *P00 = V + i * W + j,
           *P01 = V + i * W + j + 1,
           *P10 = V + (i + 1) * W + j,
           *P11 = V + (i + 1) * W + j + 1;
@@ -412,14 +398,14 @@ BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL Is
         P00->N = VecAddVec(P00->N, N);
         P01->N = VecAddVec(P01->N, N);
         P11->N = VecAddVec(P11->N, N);
-       }
+      }
     for (i = 0; i < W * H; i++)
-       V[i].N = VecNormalize(V[i].N);
+      V[i].N = VecNormalize(V[i].N);
   }
-  YR4_RndPrimCreate(Pr, V, W * H, Ind, (2 * W + 1) * (H - 1) - 1,YR4_RND_PRIM_TRISTRIP);
+  YR4_RndPrimCreate(Pr, V, W * H, Ind,
+    (2 * W + 1) * (H - 1) - 1, YR4_RND_PRIM_TRISTRIP);
   free(Ind);
   return TRUE;
 }
 
- 
 /* END OF 'RNDPRIM.C' FILE */

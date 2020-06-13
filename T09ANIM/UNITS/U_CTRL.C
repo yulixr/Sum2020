@@ -82,7 +82,25 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   if (Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  Uni->Dist += Ani->GlobalDeltaTime * (-3 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
+  Uni->Azimuth += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
+  Uni->Elevator += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
 
+  if (Uni->Elevator > 89.99)
+    Uni->Elevator = 89.99;
+  else if (Uni->Elevator < -89.99)
+    Uni->Elevator = -89.99;
+
+  if (Uni->Dist < 0.0002)
+    Uni->Dist = 0.0002;
+
+  YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
+                  MatrMulMatr(MatrRotateX(Uni->Elevator),
+                              MatrRotateY(Uni->Azimuth))),
+                VecSet(0, 0, 0),
+                VecSet(0, 1, 0));
+
+  /*
   Uni->Dist += Ani->GlobalDeltaTime * (-2 * Ani->Mdz + 8 * (Ani->Keys[VK_PRIOR] - Ani->Keys[VK_NEXT]));
 
   Uni->Azimuth += Ani->GlobalDeltaTime * (30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 35 * (-(Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT])));
@@ -92,7 +110,7 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
                   MatrMulMatr(MatrRotateX(Uni->Elevator),
                               MatrRotateY(Uni->Azimuth))),
-    VecSet(0, 0, 0), VecSet(0, 1, 0));
+    VecSet(0, 0, 0), VecSet(0, 1, 0)); */
 } /* End of 'YR4_UnitResponse' function */
 
 /* Unit render function.

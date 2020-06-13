@@ -13,6 +13,8 @@
 
 #include "../../def.h"
 
+#define YR4_STR_MAX 100
+
 extern DBL
   YR4_RndProjSize,
   YR4_RndProjDist,
@@ -53,6 +55,7 @@ typedef struct tagyr4PRIM
     Ibuf;      /* Opengl index buffer */  
   INT NumOfElements; /* Number of elements vericles */
   MATR Trans; /* Additional transformation matrix */
+  INT MtlNo; /* Material number in material array */
 } yr4PRIM;
 
 VOID YR4_RndInit( HWND hWnd );
@@ -67,6 +70,7 @@ VOID YR4_RndResize( INT W, INT H );
 VOID YR4_RndCamSet(VEC Loc, VEC At, VEC Up1);
 VOID YR4_RndProjSet( VOID );
 
+/********** prim handle ************/
 VOID YR4_RndPrimFree( yr4PRIM *Pr );
 VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI, yr4PRIM_TYPE Type );
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World );
@@ -76,8 +80,57 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName );
 BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL IsNormalsNeed );
 
 /******** shader handle ************/
+#define YR4_MAX_SHADERS 30
+
+typedef struct tagyr4SHADER
+{
+  CHAR Name[YR4_STR_MAX];
+  INT ProgId;
+} yr4SHADER;
+
+extern INT YR4_RndShaderSize;
+extern yr4SHADER YR4_RndShaders[YR4_MAX_SHADERS];
+
 INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix );
 VOID YR4_RndShdDelete( INT ProgId );
+
+/******** texture handle **********/
+typedef struct tagyr4TEXTURE
+{
+  CHAR Name[YR4_STR_MAX]; /* Name */
+  INT W, H;               /* Size */
+  UINT TexId;             /* Opengl id */
+} yr4TEXTURE;
+
+
+/******** material handle *********/
+typedef struct tagyr4MATERIAL
+{
+  CHAR Name[YR4_STR_MAX]; /* Name */
+
+  VEC Ka, Kd, Ks; /* lightning coeffs */
+  FLT Ph;    /* Phong coeff */
+  FLT Trans; /* Transparency factor */
+  INT Tex[8];     /* texture reference */
+
+  CHAR ShaderStr[YR4_STR_MAX]; 
+  INT ShdNo;                   /* shader reference */
+} yr4MATERIAL;
+
+/******** image handle ************/
+typedef struct tagyr4IMAGE
+{
+  /* Image size */
+  INT W, H;
+
+  DWORD *PixelsDW;
+  BYTE (*PixelsC)[4];
+  BYTE *Pixels;
+} yr4IMAGE;
+
+BOOL YR4_RndImgLoad( yr4IMAGE *Img, CHAR *FileName );
+VOID YR4_RndImgFree( yr4IMAGE *Img );
+BOOL YR4_RndImgCreate( yr4IMAGE *Img, INT W, INT H );
 
 #endif
 /* END OF 'RND.H' FILE */

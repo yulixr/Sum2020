@@ -10,5 +10,6 @@
 yr4UNIT * YR4_UnitCreateBall( VOID );
 yr4UNIT * YR4_UnitCreateCtrl( VOID );
 yr4UNIT * YR4_UnitCreateCow( VOID );
+yr4UNIT * YR4_UnitCreateGrid( VOID );
 
 /* END OF 'UNITS.H' FILE */

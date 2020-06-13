@@ -18,6 +18,7 @@ VOID YR4_AnimInit( HWND hWnd )
 
   YR4_TimerInit();
   YR4_AnimInputInit();
+  YR4_RndCamSet(VecSet1(10), VecSet1(0), VecSet(0, 1, 0));
 }
 
 VOID YR4_AnimClose( VOID )

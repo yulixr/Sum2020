@@ -62,7 +62,7 @@ VOID YR4_RndInit( HWND hWnd )
   YR4_RndFrameW = 100;
 
   YR4_RndProjSize = YR4_RndProjDist = 0.1;
-  YR4_RndProjFarClip = 30;
+  YR4_RndProjFarClip = 1500;
 
   YR4_RndProgId = YR4_RndShdLoad("DEFAULT");
 } /* End 'YR4_RndInit' function */

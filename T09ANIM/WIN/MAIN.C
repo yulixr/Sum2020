@@ -60,10 +60,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     NULL, NULL, hInstance, NULL);
 
   ShowWindow(hWnd, CmdShow);
-
+ /*
   for(i = 0; i < 9; i++)
     YR4_AnimAddUnit(YR4_UnitCreateBall());
-  YR4_AnimAddUnit(YR4_UnitCreateCow());
+  YR4_AnimAddUnit(YR4_UnitCreateCow());*/
+  YR4_AnimAddUnit(YR4_UnitCreateGrid());
   YR4_AnimAddUnit(YR4_UnitCreateCtrl());
   
   
