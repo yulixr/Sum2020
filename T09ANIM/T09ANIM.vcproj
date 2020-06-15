@@ -245,21 +245,37 @@
 						>
 					</File>
 					<File
-						RelativePath=".\ANIM\RND\RNDMTL.C"
-						>
-					</File>
-					<File
 						RelativePath=".\ANIM\RND\RNDPRIM.C"
 						>
 					</File>
 					<File
-						RelativePath=".\ANIM\RND\RNDSHD.C"
+						RelativePath=".\ANIM\RND\RNDPRIMS.C"
 						>
 					</File>
-					<File
-						RelativePath=".\ANIM\RND\RNDTEX.C"
+					<Filter
+						Name="Resourses"
 						>
-					</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDMTL.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDRES.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDRES.H"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDSHD.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDTEX.C"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
@@ -287,6 +303,10 @@
 				</File>
 				<File
 					RelativePath=".\UNITS\U_GRID.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_TEST.C"
 					>
 				</File>
 			</Filter>

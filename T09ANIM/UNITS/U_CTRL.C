@@ -45,7 +45,7 @@ static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   Uni->Elevator = 1;
   Uni->Dist = 8;
   //Uni->CamLoc = VecSet(0, 8, 8);
-  hFnt = CreateFont(50, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, RUSSIAN_CHARSET, 
+  hFnt = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, RUSSIAN_CHARSET, 
       OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_MODERN | VARIABLE_PITCH, "Mistral"); 
 
   hFntOld  = SelectObject(Ani->hDC, hFnt);
@@ -82,7 +82,7 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   if (Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  Uni->Dist += Ani->GlobalDeltaTime * (-3 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
+  Uni->Dist += Ani->GlobalDeltaTime * (-3.8 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
   Uni->Azimuth += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
   Uni->Elevator += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
 
@@ -99,18 +99,6 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
                               MatrRotateY(Uni->Azimuth))),
                 VecSet(0, 0, 0),
                 VecSet(0, 1, 0));
-
-  /*
-  Uni->Dist += Ani->GlobalDeltaTime * (-2 * Ani->Mdz + 8 * (Ani->Keys[VK_PRIOR] - Ani->Keys[VK_NEXT]));
-
-  Uni->Azimuth += Ani->GlobalDeltaTime * (30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 35 * (-(Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT])));
-
-  Uni->Elevator += Ani->GlobalDeltaTime * (Ani->Keys[VK_LBUTTON] * 30 * Ani->Mdy + 35 * (-(Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP])));
-
-  YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
-                  MatrMulMatr(MatrRotateX(Uni->Elevator),
-                              MatrRotateY(Uni->Azimuth))),
-    VecSet(0, 0, 0), VecSet(0, 1, 0)); */
 } /* End of 'YR4_UnitResponse' function */
 
 /* Unit render function.
@@ -123,20 +111,40 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 { 
-  INT n;
-  static CHAR Buf[100];
+  INT n[10], i;
+
   MATR m = MatrOrtho(0, Ani->W - 1, Ani->H - 1, 0, -1, 1);
-  n = sprintf(Buf, "FPS: %.3f", YR4_Anim.FPS);
-  
+
+  static CHAR Buf[10][100];
+
+  n[0] = sprintf(Buf[0], "FPS: %.3f", Ani->FPS);
+  n[1] = sprintf(Buf[1], "Renderer: %s", glGetString(GL_RENDERER));
+  n[2] = sprintf(Buf[2], "Vendor: %s", glGetString(GL_VENDOR));
+  n[3] = sprintf(Buf[3], "Version: %s", glGetString(GL_VERSION));
+  n[4] = sprintf(Buf[4], "GLSL ver: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glUseProgram(0);
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glLoadMatrixf(m.M[0]);
+  glListBase(102);
+
+  for (i = 0; i < 5; i++)
+  {
+    glRasterPos2d(10, 47 * (i + 1));
+    glColor3d(0.07, 0.01, 0.13);
+    glCallLists(n[i], GL_UNSIGNED_BYTE, Buf[i]);
+
+    glRasterPos3d(10 + 3, 47 * (i + 1) + 3, -0.1);
+    glColor3d(0.93, 0.85, 1);
+    glCallLists(n[i], GL_UNSIGNED_BYTE, Buf[i]);
+  }
+  glPopAttrib();  
+
   glLineWidth(4);
   YR4_RndPrimDraw(&Uni->Axes, MatrIdentity());
   glLineWidth(1);
-
-  glLoadMatrixf(m.M[0]);
-  glRasterPos2d(5 , 50);
-  glListBase(102);
-  glColor3d(0.01, 0.14, 0.21);
-  glCallLists(n, GL_UNSIGNED_BYTE, Buf);
 } /* End of 'YR4_UnitRender' function */
 
 /* Text unit creation function.

@@ -6,14 +6,6 @@
  */
 
 #include "../units.h"
-
-/* FILE NAME: U_COW.C
- * PROGRAMMER: YR4
- * DATE: 09.06.2020
- * PURPOSE: 3D animation project.
- *          Cow creation unit.
- */
-#include "../units.h"
 #define GRID_W 300
 #define GRID_H 300
 
@@ -37,6 +29,8 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
   INT i, j;
   yr4VERTEX *V;
   yr4IMAGE img, img1;
+  INT k = 14;
+  yr4MATERIAL mtl = YR4_RndMaterials[0];
 
   if (YR4_RndImgLoad(&img, "h1.bmp"))
   {
@@ -60,7 +54,12 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
     }
      YR4_RndImgFree(&img);
   }
-  
+  /*
+  mtl.Ka = MatLib[k].Ka;
+  mtl.Kd = MatLib[k].Kd;
+  mtl.Ks = MatLib[k].Ks;
+  mtl.Ph = MatLib[k].Ph;
+  Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl); */
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -98,7 +97,7 @@ static VOID YR4_UnitResponse( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
 {
-   YR4_RndPrimDraw(&Uni->Grid, MatrIdentity());
+  YR4_RndPrimDraw(&Uni->Grid, MatrMulMatr(MatrTranslate(VecSet(-5, -20, -5)), MatrScale(VecSet1(0.5))));
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

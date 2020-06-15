@@ -35,41 +35,40 @@ BOOL YR4_RndImgLoad( yr4IMAGE *Img, CHAR *FileName )
   BYTE *ptr;
   INT x, y, type = 0, mulx[3] = {1, 3, 4}, rgb[3][3] = {{0, 0, 0}, {0, 1, 2}, {0, 1, 2}};
   memset(Img, 0, sizeof(yr4IMAGE));
-
   hBm = LoadImage(NULL, FileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
   if (hBm == NULL)
     return FALSE;
 
   GetObject(hBm, sizeof(bm), &bm);
 
-  if (bm.bmBitsPixel == 8 || bm.bmBitsPixel == 24 || bm.bmBitsPixel == 32)
+  if (bm.bmBitsPixel != 8 && bm.bmBitsPixel != 24 && bm.bmBitsPixel != 32)
   {
-    if(!YR4_RndImgCreate(Img, bm.bmWidth, bm.bmHeight))
-    {
-      DeleteObject(hBm);
-      return FALSE;
-    }
-
-    type = bm.bmBitsPixel == 8 ? 0 : bm.bmBitsPixel == 24 ? 1 : 2;
-    ptr = bm.bmBits;
-    for (x = 0; x < Img->H; x++)
-      for (y = 0; y < Img->W; y++)
-      {
-        BYTE b = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][0]],
-             g = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][1]],
-             r = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][2]],
-             a = 255;
-
-        Img->Pixels[(y * Img->W + x) * 4 + 0] = b;
-        Img->Pixels[(y * Img->W + x) * 4 + 1] = g;
-        Img->Pixels[(y * Img->W + x) * 4 + 2] = r;
-        Img->Pixels[(y * Img->W + x) * 4 + 3] = a;
-      }
     DeleteObject(hBm);
-    return TRUE;
+    return FALSE;
   }
-  DeleteObject(hBm);
-  return FALSE;
+  if(!YR4_RndImgCreate(Img, bm.bmWidth, bm.bmHeight))
+  {
+    DeleteObject(hBm);
+    return FALSE;
+  }
+
+  type = bm.bmBitsPixel == 8 ? 0 : bm.bmBitsPixel == 24 ? 1 : 2;
+  ptr = bm.bmBits;
+  for (x = 0; x < Img->H; x++)
+    for (y = 0; y < Img->W; y++)
+    {
+      BYTE b = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][0]],
+           g = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][1]],
+           r = ptr[y * bm.bmWidthBytes + x * mulx[type] + rgb[type][2]],
+           a = 255;
+
+      Img->Pixels[(y * Img->W + x) * 4 + 0] = b;
+      Img->Pixels[(y * Img->W + x) * 4 + 1] = g;
+      Img->Pixels[(y * Img->W + x) * 4 + 2] = r;
+      Img->Pixels[(y * Img->W + x) * 4 + 3] = a;
+    }
+  DeleteObject(hBm);  
+  return TRUE;
 } /* end of YR4_RndImgLoad func */
 
 /* Free image function 

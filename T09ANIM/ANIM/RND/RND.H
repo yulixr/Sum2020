@@ -12,8 +12,7 @@
 #include "glew.h"
 
 #include "../../def.h"
-
-#define YR4_STR_MAX 100
+#include "res/rndres.h"
 
 extern DBL
   YR4_RndProjSize,
@@ -29,8 +28,7 @@ extern HWND YR4_hRndWnd;
 extern HDC YR4_hRndDC;
 extern INT YR4_RndFrameW, YR4_RndFrameH;
 extern HGLRC YR4_hRndGLRC;
-extern INT YR4_RndProgId; /* global shader id for checking */
-
+extern VEC YR4_RndCamLoc;
 typedef struct tagyr4VERTEX
 {
   VEC P; /* Vertex position */
@@ -78,44 +76,6 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
 BOOL YR4_RndPrimCreateThor( yr4PRIM *Pr, VEC C, DBL R, DBL r, INT SplitW, INT SplitH );
 BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName );
 BOOL YR4_RndPrimCreateFromGrid( yr4PRIM *Pr, yr4VERTEX *V, INT W, INT H, BOOL IsNormalsNeed );
-
-/******** shader handle ************/
-#define YR4_MAX_SHADERS 30
-
-typedef struct tagyr4SHADER
-{
-  CHAR Name[YR4_STR_MAX];
-  INT ProgId;
-} yr4SHADER;
-
-extern INT YR4_RndShaderSize;
-extern yr4SHADER YR4_RndShaders[YR4_MAX_SHADERS];
-
-INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix );
-VOID YR4_RndShdDelete( INT ProgId );
-
-/******** texture handle **********/
-typedef struct tagyr4TEXTURE
-{
-  CHAR Name[YR4_STR_MAX]; /* Name */
-  INT W, H;               /* Size */
-  UINT TexId;             /* Opengl id */
-} yr4TEXTURE;
-
-
-/******** material handle *********/
-typedef struct tagyr4MATERIAL
-{
-  CHAR Name[YR4_STR_MAX]; /* Name */
-
-  VEC Ka, Kd, Ks; /* lightning coeffs */
-  FLT Ph;    /* Phong coeff */
-  FLT Trans; /* Transparency factor */
-  INT Tex[8];     /* texture reference */
-
-  CHAR ShaderStr[YR4_STR_MAX]; 
-  INT ShdNo;                   /* shader reference */
-} yr4MATERIAL;
 
 /******** image handle ************/
 typedef struct tagyr4IMAGE

@@ -11,7 +11,7 @@ HWND YR4_hRndWnd; /* Work window handle */
 HDC YR4_hRndDC; /* Work window device conext */
 INT YR4_RndFrameW, YR4_RndFrameH; /* Work window size */
 HGLRC YR4_hRndGLRC; /* OpenGL context */
-INT YR4_RndProgId;
+VEC YR4_RndCamLoc;
 
 DBL
   YR4_RndProjSize,  /* Project plane fit square */

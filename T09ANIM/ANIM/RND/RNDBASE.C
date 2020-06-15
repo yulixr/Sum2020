@@ -22,7 +22,6 @@ VOID YR4_RndInit( HWND hWnd )
 {
   INT i;
   PIXELFORMATDESCRIPTOR pfd = {0};
-  CHAR *Str;
 
   YR4_hRndWnd = hWnd; 
 
@@ -48,10 +47,6 @@ VOID YR4_RndInit( HWND hWnd )
   if (!(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader))
     exit(0);
 
-  Str = glGetString(GL_VENDOR);
-  Str = glGetString(GL_RENDERER);
-  Str = glGetString(GL_VERSION);
-
   glClearColor(0.30, 0.47, 0.8, 1);
   glEnable(GL_DEPTH_TEST);
 
@@ -64,7 +59,8 @@ VOID YR4_RndInit( HWND hWnd )
   YR4_RndProjSize = YR4_RndProjDist = 0.1;
   YR4_RndProjFarClip = 1500;
 
-  YR4_RndProgId = YR4_RndShdLoad("DEFAULT");
+   YR4_RndCamSet(VecSet1(10), VecSet1(0), VecSet(0, 1, 0));
+   YR4_RndResInit();
 } /* End 'YR4_RndInit' function */
 
 /* Close function.
@@ -75,8 +71,7 @@ VOID YR4_RndInit( HWND hWnd )
  */
 VOID YR4_RndClose( VOID )
 {
-  YR4_RndShdDelete(YR4_RndProgId);
-
+  YR4_RndResClose();
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(YR4_hRndGLRC);
   
@@ -92,8 +87,7 @@ VOID YR4_RndClose( VOID )
  */
 VOID YR4_RndCopyFrame( VOID )
 {
-  SwapBuffers(YR4_hRndDC);
-  //wglSwapLayerBuffers(YR4_hRndDC, WGL_SWAP_MAIN_PLANE); 
+  SwapBuffers(YR4_hRndDC); 
 } /* End of function */
 
 /* Set camera function.
@@ -106,6 +100,7 @@ VOID YR4_RndCopyFrame( VOID )
 VOID YR4_RndCamSet( VEC Loc, VEC At, VEC Up )
 {
   YR4_RndMatrView = MatrView(Loc, At, Up);
+  YR4_RndCamLoc = Loc;
   YR4_RndMatrVP = MatrMulMatr(YR4_RndMatrView, YR4_RndMatrProj);
 } /* End of 'YR4_RndCamSet' function */
 
@@ -117,15 +112,16 @@ VOID YR4_RndCamSet( VEC Loc, VEC At, VEC Up )
  */
 VOID YR4_RndStart( VOID )
 {
+#ifndef NDEBUG
   INT t;
   static INT reload_time;
 
   if ((t = clock()) - reload_time > 2 * CLOCKS_PER_SEC)
   {
-    YR4_RndShdDelete(YR4_RndProgId);
-    YR4_RndProgId = YR4_RndShdLoad("DEFAULT");
+    YR4_RndShdUpdate();
     reload_time = t;
   }
+#endif
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } /* End of 'YR4_RndStart' function */
 

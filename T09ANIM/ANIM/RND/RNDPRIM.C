@@ -111,23 +111,33 @@ VOID YR4_RndPrimFree( yr4PRIM *Pr )
  */
 VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
 {
-  MATR M = MatrMulMatr3(Pr->Trans, World, YR4_RndMatrVP);
-  INT loc, gl_prim_type;
+  MATR w = MatrMulMatr2(Pr->Trans, World),
+    winv = MatrTranspose(MatrInverse(w)),
+    wvp = MatrMulMatr2(w, YR4_RndMatrVP);
+
+  INT loc, gl_prim_type, ProgId;
 
   gl_prim_type = Pr->Type == YR4_RND_PRIM_LINES ? GL_LINES :
              Pr->Type == YR4_RND_PRIM_TRIMESH ? GL_TRIANGLES :
              Pr->Type == YR4_RND_PRIM_TRISTRIP ? GL_TRIANGLE_STRIP :
              GL_POINTS;
-  glLoadMatrixf(M.M[0]);
+  glLoadMatrixf(wvp.M[0]);
 
-  glUseProgram(YR4_RndProgId);
+  ProgId = YR4_RndMtlApply(Pr->MtlNo);
+  //glUseProgram(YR4_RndProgId);
 
   /* Pass render uniform */
-  if ((loc = glGetUniformLocation(YR4_RndProgId, "MatrWVP")) != -1)
-    glUniformMatrix4fv(loc, 1, FALSE, M.M[0]);
-  if ((loc = glGetUniformLocation(YR4_RndProgId, "Time")) != -1)
+   if ((loc = glGetUniformLocation(ProgId, "MatrWVP")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, wvp.M[0]);
+  if ((loc = glGetUniformLocation(ProgId, "MatrW")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, w.M[0]);
+  if ((loc = glGetUniformLocation(ProgId, "MatrWinv")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, winv.M[0]);
+  if ((loc = glGetUniformLocation(ProgId, "CamLoc")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndCamLoc.X);
+  if ((loc = glGetUniformLocation(ProgId, "Time")) != -1)
     glUniform1f(loc, YR4_Anim.Time);
-  if ((loc = glGetUniformLocation(YR4_RndProgId, "GlobalTime")) != -1)
+  if ((loc = glGetUniformLocation(ProgId, "GlobalTime")) != -1)
     glUniform1f(loc, YR4_Anim.GlobalTime);
 
   /* Draw all triangles */
@@ -187,8 +197,10 @@ BOOL YR4_RndPrimCreateSphere( yr4PRIM *Pr, VEC C, DBL R, INT SplitW, INT SplitH 
                               C.Y + R * y,
                               C.Z + R * z));
 
-       V[m].C = Vec4Set(0.8, 0.3, 0.47, 1);
+       V[m].C = Vec4Set(1, 1, 1, 1);
        V[m].N = VecSet(x, y, z);
+       V[m].T.X = j / (SplitW - 1.0);
+       V[m].T.Y = -i / (SplitH - 1.0);
        m++;
     }
 
@@ -332,7 +344,7 @@ BOOL YR4_RndPrimLoad( yr4PRIM *Pr, CHAR *FileName )
   for (i = 0; i < nv; i++)
   { 
     V[i].N = VecNormalize(V[i].N);
-    V[i].C = Vec4Set(0.8, 0.47, 0.26, 1);
+    V[i].C = Vec4Set(1, 1, 1, 1);
   }
 
   fclose(F);

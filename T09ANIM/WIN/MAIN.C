@@ -65,8 +65,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     YR4_AnimAddUnit(YR4_UnitCreateBall());
   YR4_AnimAddUnit(YR4_UnitCreateCow());*/
   YR4_AnimAddUnit(YR4_UnitCreateGrid());
+  YR4_AnimAddUnit(YR4_UnitCreateTest());
   YR4_AnimAddUnit(YR4_UnitCreateCtrl());
-  
   
   /* Message loop */
   while (TRUE)
