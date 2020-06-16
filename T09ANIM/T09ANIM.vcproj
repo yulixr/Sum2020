@@ -306,6 +306,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UNITS\U_SHIP.C"
+					>
+				</File>
+				<File
 					RelativePath=".\UNITS\U_TEST.C"
 					>
 				</File>

@@ -30,6 +30,7 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 {
   HFONT hFnt, hFntOld;
+  yr4MATERIAL mtl;
   yr4VERTEX V[] = 
   {
     {{0, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
@@ -40,6 +41,10 @@ static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
     {{0, 0, 300}, {0, 0}, {0, 0, 0}, {0, 0, 1, 1}}
   };
   YR4_RndPrimCreate(&Uni->Axes, V, 6, NULL, 0, YR4_RND_PRIM_LINES);
+  mtl = YR4_RndMtlGetDef();
+  mtl.ShdNo = YR4_RndShdAdd("AXES");
+  Uni->Axes.MtlNo = YR4_RndMtlAdd(&mtl);
+
 
   Uni->Azimuth = 20;
   Uni->Elevator = 1;
@@ -76,15 +81,16 @@ static VOID YR4_UnitClose( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 { 
-  if (Ani->KeysClick['P'])
+  if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
-  if (Ani->KeysClick['W'])
+  if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['W'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  if (Ani->KeysClick['S'])
+  if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  Uni->Dist += Ani->GlobalDeltaTime * (-3.8 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
+  Uni->Dist += Ani->GlobalDeltaTime * (-2.5 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
   Uni->Azimuth += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
   Uni->Elevator += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
+  Uni->Dist += Ani->GlobalDeltaTime * 6 * (Ani->Keys[VK_SPACE] - Ani->Keys[VK_TAB]);
 
   if (Uni->Elevator > 89.99)
     Uni->Elevator = 89.99;
@@ -93,7 +99,7 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 
   if (Uni->Dist < 0.0002)
     Uni->Dist = 0.0002;
-
+  if (Ani->IsPause)
   YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
                   MatrMulMatr(MatrRotateX(Uni->Elevator),
                               MatrRotateY(Uni->Azimuth))),

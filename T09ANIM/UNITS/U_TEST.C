@@ -11,7 +11,7 @@
 typedef struct
 {
   YR4_UNIT_BASE_FIELDS;
-  yr4PRIM Pr, Pr1;
+  yr4PRIM Pr1;
 } yr4UNIT_TEST;
 
 /* Unit initialization function.
@@ -25,22 +25,14 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 {
   INT k = 11;
-  yr4MATERIAL mtl = YR4_RndMaterials[0];
-
-  YR4_RndPrimCreateSphere(&Uni->Pr, VecSet1(0), 3, 28, 12);
-  //mtl.Tex[0] = YR4_RndTexAdd("h1c.bmp");
-  mtl.Ka = MatLib[k].Ka;
-  mtl.Kd = MatLib[k].Kd;
-  mtl.Ks = MatLib[k].Ks;
-  mtl.Ph = MatLib[k].Ph;
-  Uni->Pr.MtlNo = YR4_RndMtlAdd(&mtl);
+  yr4MATERIAL mtl = YR4_RndMtlGetDef();
   
-  YR4_RndPrimCreateSphere(&Uni->Pr1, VecSet1(0), 200, 19, 8);
+  YR4_RndPrimCreateSphere(&Uni->Pr1, VecSet1(0), 250, 21, 10);
   mtl = YR4_RndMaterials[0];
   mtl.Tex[0] = YR4_RndTexAdd("sky.bmp");
   mtl.ShdNo = YR4_RndShdAdd("SKY");
   mtl.Kd = VecSet1(0.9);
-  Uni->Pr1.MtlNo = YR4_RndMtlAdd(&mtl);
+  Uni->Pr1.MtlNo = YR4_RndMtlAdd(&mtl); 
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -53,7 +45,6 @@ static VOID YR4_UnitInit( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitClose( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 {
-  YR4_RndPrimFree(&Uni->Pr);
   YR4_RndPrimFree(&Uni->Pr1);
 } /* End of 'YR4_UnitClose' function */
 
@@ -80,8 +71,7 @@ static VOID YR4_UnitResponse( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitRender( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimDraw(&Uni->Pr1, MatrTranslate(VecSet(0, -10, 0)));
-  YR4_RndPrimDraw(&Uni->Pr, 
-    MatrMulMatr(MatrTranslate(VecSet(sin(Ani->Time), 1, 0)), MatrRotateY(20 * Ani->Time)));
+
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

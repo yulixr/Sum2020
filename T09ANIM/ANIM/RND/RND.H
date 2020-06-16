@@ -92,5 +92,18 @@ BOOL YR4_RndImgLoad( yr4IMAGE *Img, CHAR *FileName );
 VOID YR4_RndImgFree( yr4IMAGE *Img );
 BOOL YR4_RndImgCreate( yr4IMAGE *Img, INT W, INT H );
 
+/******** prims handle **********/
+typedef struct tagyr4PRIMS
+{
+  INT NumOfPrims; /* Number of primitives in array */  
+  yr4PRIM *Prims; /* Array of primitives */
+  MATR Trans;     /* Common transformation matrix */
+} yr4PRIMS;
+
+BOOL YR4_RndPrimsLoad( yr4PRIMS *Prs, CHAR *FileName );
+VOID YR4_RndPrimsDraw( yr4PRIMS *Prs, MATR World );
+VOID YR4_RndPrimsFree( yr4PRIMS *Prs );
+BOOL YR4_RndPrimsCreate( yr4PRIMS *Prs, INT NumOfPrims );
+
 #endif
 /* END OF 'RND.H' FILE */

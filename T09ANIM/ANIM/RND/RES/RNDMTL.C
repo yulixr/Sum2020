@@ -57,6 +57,19 @@ INT YR4_RndMtlAdd( yr4MATERIAL *Mtl )
   return YR4_RndMaterialsSize++;
 } /* End of 'YR4_RndMtlAdd' function */
 
+
+yr4MATERIAL * YR4_RndMtlGet( INT MtlNo )
+{
+  /* Get material pointer */
+  if (MtlNo < 0 || MtlNo >= YR4_RndMaterialsSize)
+    MtlNo = 0;
+  return &YR4_RndMaterials[MtlNo];
+}
+ 
+yr4MATERIAL YR4_RndMtlGetDef( VOID )
+{
+  return YR4_RndMaterials[0];
+}
 /* Add new material to stock function.
  * ARGUMENTS:
  *   - material table number:

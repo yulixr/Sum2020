@@ -45,7 +45,10 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
             BYTE *cc = img1.PixelsC[i * img1.W + j];
 
             V[i * img.W + j].P = VecSet(j - img.W / 2, 50 * c / 255.9, img.H / 2 - i);
-            V[i * img.W + j].C = Vec4Set(cc[2] / 255.0, cc[1] / 255.0, cc[0] / 255.0 , 1);
+            //V[i * img.W + j].C = Vec4Set(cc[2] / 255.0, cc[1] / 255.0, cc[0] / 255.0 , 1);
+            V[i * img.W + j].C = Vec4Set(1, 1, 1, 1);
+            V[i * img.W + j].T.X = j / (img.W - 1.0);
+            V[i * img.W + j].T.Y = i / (img.H - 1.0);
           }
           YR4_RndPrimCreateFromGrid(&Uni->Grid, V, img.W, img.H, TRUE);
           free(V);
@@ -54,6 +57,9 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
     }
      YR4_RndImgFree(&img);
   }
+  mtl = YR4_RndMtlGetDef();
+  mtl.Tex[0] = YR4_RndTexAdd("h1c.bmp");
+  Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl);
   /*
   mtl.Ka = MatLib[k].Ka;
   mtl.Kd = MatLib[k].Kd;

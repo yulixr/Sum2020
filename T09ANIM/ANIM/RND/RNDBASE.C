@@ -53,6 +53,9 @@ VOID YR4_RndInit( HWND hWnd )
   glEnable(GL_PRIMITIVE_RESTART);
   glPrimitiveRestartIndex(-1);
 
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   YR4_RndFrameH = 100;
   YR4_RndFrameW = 100;
 
