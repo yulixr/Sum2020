@@ -56,7 +56,14 @@ static VOID YR4_UnitClose( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitResponse( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
 { 
   VEC p;
-  Uni->Speed += !Ani->Keys[VK_SHIFT] * (1 + Ani->Keys[VK_CONTROL] * 5) * (Ani->Keys['W'] - Ani->Keys['S']) * 0.02 * Ani->DeltaTime;
+  FLT t;
+  if (Ani->KeysClick[VK_SPACE])
+  {
+    Uni->Speed = 0;
+    Uni->Pos = VecSet1(0);
+    Uni->CamPos = VecSet(20, 10, 13);
+  }
+  Uni->Speed += !Ani->Keys[VK_SHIFT] * (1 + Ani->Keys[VK_CONTROL] * 3) * (Ani->Keys['W'] - Ani->Keys['S']) * 0.02 * Ani->DeltaTime;
   Uni->Head += !Ani->Keys[VK_SHIFT] * (Ani->Keys['A'] - Ani->Keys['D']) * 37 * Ani->DeltaTime;
   Uni->Pos.Y += (Ani->Keys[VK_ADD] - Ani->Keys[VK_SUBTRACT]) * 5 * Ani->DeltaTime;
   Uni->Pos = VecAddVec(Uni->Pos,
@@ -66,6 +73,7 @@ static VOID YR4_UnitResponse( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
   Uni->CamPos = VecAddVec(Uni->CamPos, VecMulNum(VecSubVec(p, Uni->CamPos), Ani->DeltaTime));
   YR4_RndCamSet(Uni->CamPos,
     Uni->Pos, VecSet(0, 1, 0));
+ 
 
 } /* End of 'YR4_UnitResponse' function */
 
@@ -80,8 +88,7 @@ static VOID YR4_UnitResponse( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitRender( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimsDraw(&Uni->Pr, 
-    MatrMulMatr3(MatrRotateY(Uni->Head),
-    MatrRotateX(Uni->Speed * 300 < 90 ? Uni->Speed * 300 : -Uni->Speed * 300 ),
+    MatrMulMatr(MatrRotateY(Uni->Head),
     MatrTranslate(Uni->Pos)));
   /*
   glEnable(GL_CULL_FACE);

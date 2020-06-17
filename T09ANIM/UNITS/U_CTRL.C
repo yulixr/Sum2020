@@ -90,7 +90,7 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   Uni->Dist += Ani->GlobalDeltaTime * (-2.5 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
   Uni->Azimuth += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
   Uni->Elevator += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
-  Uni->Dist += Ani->GlobalDeltaTime * 6 * (Ani->Keys[VK_SPACE] - Ani->Keys[VK_TAB]);
+  Uni->Dist += Ani->GlobalDeltaTime * 25 * (Ani->Keys[VK_SPACE] - Ani->Keys[VK_TAB]);
 
   if (Uni->Elevator > 89.99)
     Uni->Elevator = 89.99;

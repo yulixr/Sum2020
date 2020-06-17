@@ -12,6 +12,7 @@ typedef struct
 {
   YR4_UNIT_BASE_FIELDS;
   yr4PRIM Pr1;
+  yr4PRIMS Pr, Mod;
 } yr4UNIT_TEST;
 
 /* Unit initialization function.
@@ -27,6 +28,9 @@ static VOID YR4_UnitInit( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
   INT k = 11;
   yr4MATERIAL mtl = YR4_RndMtlGetDef();
   
+  YR4_RndPrimsLoad(&Uni->Pr, "BIN/MODELS/wood.g3dm");
+  YR4_RndPrimsLoad(&Uni->Mod, "BIN/MODELS/Corona.g3dm");
+
   YR4_RndPrimCreateSphere(&Uni->Pr1, VecSet1(0), 250, 21, 10);
   mtl = YR4_RndMaterials[0];
   mtl.Tex[0] = YR4_RndTexAdd("sky.bmp");
@@ -46,6 +50,8 @@ static VOID YR4_UnitInit( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitClose( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimFree(&Uni->Pr1);
+  YR4_RndPrimsFree(&Uni->Pr);
+  YR4_RndPrimsFree(&Uni->Mod);
 } /* End of 'YR4_UnitClose' function */
 
 /* Unit inter frame events handle function.
@@ -70,8 +76,12 @@ static VOID YR4_UnitResponse( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_TEST *Uni, yr4ANIM *Ani )
 {
+  INT i;
   YR4_RndPrimDraw(&Uni->Pr1, MatrTranslate(VecSet(0, -10, 0)));
-
+  for (i = 0; i < 3; i++)
+    YR4_RndPrimsDraw(&Uni->Pr, MatrMulMatr(MatrTranslate(VecSet(52, 9,-19 + i * 5.5)), MatrScale(VecSet1(3))));
+  for (i = 0; i <1; i++)
+    YR4_RndPrimsDraw(&Uni->Mod, MatrMulMatr3(MatrRotateX(-90), MatrRotateY(Ani->GlobalTime * 30),MatrTranslate(VecSet(-48 + i * 8, 9, 10 - i * 8))));
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

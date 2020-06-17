@@ -60,12 +60,6 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
   mtl = YR4_RndMtlGetDef();
   mtl.Tex[0] = YR4_RndTexAdd("h1c.bmp");
   Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl);
-  /*
-  mtl.Ka = MatLib[k].Ka;
-  mtl.Kd = MatLib[k].Kd;
-  mtl.Ks = MatLib[k].Ks;
-  mtl.Ph = MatLib[k].Ph;
-  Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl); */
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -103,7 +97,8 @@ static VOID YR4_UnitResponse( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
 {
-  YR4_RndPrimDraw(&Uni->Grid, MatrMulMatr(MatrTranslate(VecSet(-5, -20, -5)), MatrScale(VecSet1(0.5))));
+  YR4_RndPrimDraw(&Uni->Grid, MatrMulMatr(MatrTranslate(VecSet(-5, -30, -5)), 
+    MatrScale(VecSet1(1.5))));
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

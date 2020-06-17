@@ -33,7 +33,7 @@ VOID YR4_RndShdClose( VOID );
 
 /******** texture handle **********/
 
-#define YR4_MAX_TEXTURES 300
+#define YR4_MAX_TEXTURES 500
 typedef struct tagyr4TEXTURE
 {
   CHAR Name[YR4_STR_MAX]; /* Name */
@@ -50,7 +50,7 @@ INT YR4_RndTexAddImg( CHAR *Name, INT W, INT H, INT C, DWORD *Bits );
 INT YR4_RndTexAdd( CHAR *FileName );
 
 /******** material handle *********/
-#define YR4_MAX_MATERIALS 350
+#define YR4_MAX_MATERIALS 3000
 
 typedef struct tagyr4MATERIAL
 {
