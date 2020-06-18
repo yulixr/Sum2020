@@ -11,7 +11,9 @@ yr4UNIT * YR4_UnitCreateBall( VOID );
 yr4UNIT * YR4_UnitCreateCtrl( VOID );
 yr4UNIT * YR4_UnitCreateCow( VOID );
 yr4UNIT * YR4_UnitCreateGrid( VOID );
-yr4UNIT * YR4_UnitCreateTest( VOID );
+yr4UNIT * YR4_UnitCreateSky( VOID );
 yr4UNIT * YR4_UnitCreateShip( VOID );
+yr4UNIT * YR4_UnitCreateVirus( VOID );
+yr4UNIT * YR4_UnitCreatePanel( VOID );
 
 /* END OF 'UNITS.H' FILE */

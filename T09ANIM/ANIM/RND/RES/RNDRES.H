@@ -109,6 +109,19 @@ static struct
 VOID YR4_RndResInit( VOID );
 VOID YR4_RndResClose( VOID );
 
+/****** font handle ********/
+/* Font description structure */
+typedef struct tagyr4FONT
+{
+  DWORD LineH, BaseH; /* Font line height and base line height in pixels */
+  FLT AdvanceX[256];  /* Every letter shift right value (0 if no letter present) */
+} yr4FONT; 
+
+BOOL YR4_RndFntLoad( CHAR *FileName );
+VOID YR4_RndFntInit( VOID );
+VOID YR4_RndFntClose( VOID );
+VOID YR4_RndFntDraw( CHAR *Str, VEC Pos, FLT Size, VEC Color );
+
 
 #endif
 /* END OF 'RNDRES.H' FILE */

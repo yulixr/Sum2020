@@ -13,6 +13,7 @@ VOID YR4_RndResInit( VOID )
   YR4_RndShdInit();
   YR4_RndTexInit();
   YR4_RndMtlInit();
+  YR4_RndFntInit();
 }
 
 VOID YR4_RndResClose( VOID )
@@ -20,6 +21,7 @@ VOID YR4_RndResClose( VOID )
   YR4_RndShdClose();
   YR4_RndTexClose();
   YR4_RndMtlClose();
+  YR4_RndFntClose();
 }
 
 /* END OF 'RNDRES.C' FILE */

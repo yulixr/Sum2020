@@ -256,6 +256,10 @@
 						Name="Resourses"
 						>
 						<File
+							RelativePath=".\ANIM\RND\RES\RNDFNT.C"
+							>
+						</File>
+						<File
 							RelativePath=".\ANIM\RND\RES\RNDMTL.C"
 							>
 						</File>
@@ -294,6 +298,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UNITS\U_BUILDS.C"
+					>
+				</File>
+				<File
 					RelativePath=".\UNITS\U_COW.C"
 					>
 				</File>
@@ -310,7 +318,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UNITS\U_TEST.C"
+					RelativePath=".\UNITS\U_SKY.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_VIRUS.C"
 					>
 				</File>
 			</Filter>

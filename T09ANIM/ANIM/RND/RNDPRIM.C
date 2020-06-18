@@ -30,6 +30,26 @@ VOID YR4_RndPrimCreate( yr4PRIM *Pr, yr4VERTEX *V, INT NoofV, INT *I, INT NoofI,
 
   if (V != NULL)
   {
+    INT i;
+
+    Pr->MinBB = Pr->MaxBB = V[0].P;
+    for (i = 1; i < NoofV; i++)
+    {
+      if (Pr->MinBB.X > V[i].P.X)
+        Pr->MinBB.X = V[i].P.X;
+      if (Pr->MinBB.Y > V[i].P.Y)
+        Pr->MinBB.Y = V[i].P.Y;
+      if (Pr->MinBB.Z > V[i].P.Z)
+        Pr->MinBB.Z = V[i].P.Z;
+
+      if (Pr->MaxBB.X < V[i].P.X)
+        Pr->MaxBB.X = V[i].P.X;      
+      if (Pr->MaxBB.Y < V[i].P.Y)
+        Pr->MaxBB.Y = V[i].P.Y;     
+      if (Pr->MaxBB.Z < V[i].P.Z)
+        Pr->MaxBB.Z = V[i].P.Z;
+    }
+
     glGenBuffers(1, &Pr->VBuf);
     glGenVertexArrays(1, &Pr->VA);
 
@@ -139,6 +159,23 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
     glUniform1f(loc, YR4_Anim.Time);
   if ((loc = glGetUniformLocation(ProgId, "GlobalTime")) != -1)
     glUniform1f(loc, YR4_Anim.GlobalTime);
+  
+  if ((loc = glGetUniformLocation(ProgId, "Addon0")) != -1)
+    glUniform1f(loc, YR4_RndShdAddon0);
+  if ((loc = glGetUniformLocation(ProgId, "Addon1")) != -1)
+    glUniform1f(loc, YR4_RndShdAddon1);
+  if ((loc = glGetUniformLocation(ProgId, "Addon2")) != -1)
+    glUniform1f(loc, YR4_RndShdAddon2);
+
+  if ((loc = glGetUniformLocation(ProgId, "AddonV0")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndShdAddonV0.X);
+
+  if ((loc = glGetUniformLocation(ProgId, "IsWireframe")) != -1)
+  {
+    INT modes[2];
+    glGetIntegerv(GL_POLYGON_MODE, modes);
+    glUniform1i(loc, modes[0] == GL_LINE ? 1 : 0);
+  }
 
   /* Draw all triangles */
   if (Pr->Ibuf != 0)

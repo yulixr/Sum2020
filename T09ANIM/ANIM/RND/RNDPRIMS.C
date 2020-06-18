@@ -1,6 +1,6 @@
 /* FILE NAME: RNDPRIMS.S
  * PROGRAMMER: YR4
- * DATE: 13.06.2020
+ * DATE: 15.06.2020
  * PURPOSE: 3D animation project.
  *          Prims file.
  */
@@ -54,21 +54,33 @@ VOID YR4_RndPrimsFree( yr4PRIMS *Prs )
 VOID YR4_RndPrimsDraw( yr4PRIMS *Prs, MATR World )
 {
   INT i;
+  World = MatrMulMatr(Prs->Trans, World);
+
+  YR4_RndShdAddon0 = Prs->NumOfPrims;
     /* Draw all nontransparent primitives */
   for (i = 0; i < Prs->NumOfPrims; i++)
     if (YR4_RndMtlGet(Prs->Prims[i].MtlNo)->Trans == 1)
+    {
+      YR4_RndShdAddon1 = i;
       YR4_RndPrimDraw(&Prs->Prims[i], World);
+    }
 
   /* Draw all transparent primitives */
   glEnable(GL_CULL_FACE);
   glCullFace(GL_FRONT);
   for (i = 0; i < Prs->NumOfPrims; i++)
     if (YR4_RndMtlGet(Prs->Prims[i].MtlNo)->Trans != 1)
+    {
+      YR4_RndShdAddon1 = i;
       YR4_RndPrimDraw(&Prs->Prims[i], World);
+    }
   glCullFace(GL_BACK);
   for (i = 0; i < Prs->NumOfPrims; i++)
     if (YR4_RndMtlGet(Prs->Prims[i].MtlNo)->Trans != 1)
+    {
+      YR4_RndShdAddon1 = i;
       YR4_RndPrimDraw(&Prs->Prims[i], World);
+    }
   glDisable(GL_CULL_FACE);
 
 } /* End of 'YR4_RndPrimsDraw' function */
@@ -195,7 +207,7 @@ BOOL YR4_RndPrimsLoad( yr4PRIMS *Prs, CHAR *FileName )
     YR4_RndTexAddImg(tex->Name, tex->W, tex->H, tex->C, ptr);
     ptr += tex->W * tex->H * tex->C;
   }
-
+  fclose(F);
   free(mem);
   return TRUE;
 } /* End of 'YR4_RndPrimsLoad' function */

@@ -45,7 +45,6 @@ static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   mtl.ShdNo = YR4_RndShdAdd("AXES");
   Uni->Axes.MtlNo = YR4_RndMtlAdd(&mtl);
 
-
   Uni->Azimuth = 20;
   Uni->Elevator = 1;
   Uni->Dist = 8;
@@ -81,16 +80,34 @@ static VOID YR4_UnitClose( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 { 
+  FLT Wp, Hp, sx, sy;
+  VEC dv;
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['W'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+  Wp = YR4_RndProjSize;
+  Hp = YR4_RndProjSize;
+
+  if (Ani->W >= Ani->H)
+    Wp *= (FLT)Ani->W / Ani->H;
+  else
+    Hp *= (FLT)Ani->H / Ani->W;
+
+  sx = Wp / Ani->W * Uni->Dist / YR4_RndProjDist;
+  sy = Hp / Ani->H * Uni->Dist / YR4_RndProjDist;
+
+  dv = VecAddVec(VecMulNum(YR4_RndCamRight, -sx * Ani->Keys[VK_RBUTTON] * Ani->Mdy),
+                 VecMulNum(YR4_RndCamUp, sy * Ani->Keys[VK_RBUTTON] * Ani->Mdx));
+  YR4_RndCamAt = VecAddVec(YR4_RndCamAt, dv);
+  YR4_RndCamLoc = VecAddVec(YR4_RndCamLoc, dv);
+
   Uni->Dist += Ani->GlobalDeltaTime * (-2.5 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
-  Uni->Azimuth += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
-  Uni->Elevator += Ani->GlobalDeltaTime * (-30 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
-  Uni->Dist += Ani->GlobalDeltaTime * 25 * (Ani->Keys[VK_SPACE] - Ani->Keys[VK_TAB]);
+  Uni->Azimuth += Ani->GlobalDeltaTime * (-26 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
+  Uni->Elevator += Ani->GlobalDeltaTime * (-26 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
 
   if (Uni->Elevator > 89.99)
     Uni->Elevator = 89.99;
@@ -101,9 +118,10 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
     Uni->Dist = 0.0002;
   if (Ani->IsPause)
   YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
-                  MatrMulMatr(MatrRotateX(Uni->Elevator),
-                              MatrRotateY(Uni->Azimuth))),
-                VecSet(0, 0, 0),
+                  MatrMulMatr3(MatrRotateX(Uni->Elevator),
+                              MatrRotateY(Uni->Azimuth),
+                              MatrTranslate(YR4_RndCamAt))),
+                YR4_RndCamAt,
                 VecSet(0, 1, 0));
 } /* End of 'YR4_UnitResponse' function */
 
@@ -117,36 +135,29 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 { 
-  INT n[10], i;
+  MATR m1, m2, m3;
+  static CHAR Buf[1000];
 
-  MATR m = MatrOrtho(0, Ani->W - 1, Ani->H - 1, 0, -1, 1);
+  YR4_RndFntDraw("BIG MOUNTAIN", VecSet(-25, 20,-10), 4, VecSet(1, 0, 1)); 
+  m1 = YR4_RndMatrView;
+  m2 = YR4_RndMatrProj;
+  m3 = YR4_RndMatrVP;
 
-  static CHAR Buf[10][100];
+  YR4_RndMatrView = MatrIdentity();
+  YR4_RndMatrVP = YR4_RndMatrProj = MatrOrtho(0, (Ani->W - 1) / 30.0, -(Ani->H - 1) / 30.0, 0, -1, 1);
 
-  n[0] = sprintf(Buf[0], "FPS: %.3f", Ani->FPS);
-  n[1] = sprintf(Buf[1], "Renderer: %s", glGetString(GL_RENDERER));
-  n[2] = sprintf(Buf[2], "Vendor: %s", glGetString(GL_VENDOR));
-  n[3] = sprintf(Buf[3], "Version: %s", glGetString(GL_VERSION));
-  n[4] = sprintf(Buf[4], "GLSL ver: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+  sprintf(Buf,
+    "FPS: %.3f\n"
+    "Renderer: %s\n"
+    "Vendor: %s\n"
+    "Version: %s\n"
+    "GLSL ver: %s",
+    Ani->FPS, glGetString(GL_RENDERER), glGetString(GL_VENDOR), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
+  YR4_RndFntDraw(Buf, VecSet1(0), 1, VecSet1(1));
 
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-  glUseProgram(0);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  glLoadMatrixf(m.M[0]);
-  glListBase(102);
-
-  for (i = 0; i < 5; i++)
-  {
-    glRasterPos2d(10, 47 * (i + 1));
-    glColor3d(0.07, 0.01, 0.13);
-    glCallLists(n[i], GL_UNSIGNED_BYTE, Buf[i]);
-
-    glRasterPos3d(10 + 3, 47 * (i + 1) + 3, -0.1);
-    glColor3d(0.93, 0.85, 1);
-    glCallLists(n[i], GL_UNSIGNED_BYTE, Buf[i]);
-  }
-  glPopAttrib();  
+  YR4_RndMatrView = m1;
+  YR4_RndMatrProj = m2;
+  YR4_RndMatrVP = m3;
 
   glLineWidth(4);
   YR4_RndPrimDraw(&Uni->Axes, MatrIdentity());

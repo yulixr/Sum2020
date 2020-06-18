@@ -103,8 +103,14 @@ VOID YR4_RndCopyFrame( VOID )
 VOID YR4_RndCamSet( VEC Loc, VEC At, VEC Up )
 {
   YR4_RndMatrView = MatrView(Loc, At, Up);
-  YR4_RndCamLoc = Loc;
   YR4_RndMatrVP = MatrMulMatr(YR4_RndMatrView, YR4_RndMatrProj);
+
+  YR4_RndCamLoc = Loc;
+  YR4_RndCamAt = At;
+  YR4_RndCamUp = VecSet(YR4_RndMatrView.M[0][0], YR4_RndMatrView.M[1][0], YR4_RndMatrView.M[2][0]);
+  YR4_RndCamRight = VecSet(YR4_RndMatrView.M[0][1], YR4_RndMatrView.M[1][1], YR4_RndMatrView.M[2][1]);
+  YR4_RndCamDir = VecSet(-YR4_RndMatrView.M[0][2], -YR4_RndMatrView.M[1][2], -YR4_RndMatrView.M[2][2]);
+  
 } /* End of 'YR4_RndCamSet' function */
 
 /* Start drawing function.

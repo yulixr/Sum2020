@@ -28,7 +28,13 @@ extern HWND YR4_hRndWnd;
 extern HDC YR4_hRndDC;
 extern INT YR4_RndFrameW, YR4_RndFrameH;
 extern HGLRC YR4_hRndGLRC;
-extern VEC YR4_RndCamLoc;
+extern VEC YR4_RndCamLoc,
+    YR4_RndCamAt, 
+    YR4_RndCamDir, 
+    YR4_RndCamRight, 
+    YR4_RndCamUp;
+extern FLT YR4_RndShdAddon0, YR4_RndShdAddon1, YR4_RndShdAddon2;
+extern VEC YR4_RndShdAddonV0, YR4_RndShdAddonV1, YR4_RndShdAddonV2;
 typedef struct tagyr4VERTEX
 {
   VEC P; /* Vertex position */
@@ -54,6 +60,7 @@ typedef struct tagyr4PRIM
   INT NumOfElements; /* Number of elements vericles */
   MATR Trans; /* Additional transformation matrix */
   INT MtlNo; /* Material number in material array */
+  VEC MinBB, MaxBB;
 } yr4PRIM;
 
 VOID YR4_RndInit( HWND hWnd );
