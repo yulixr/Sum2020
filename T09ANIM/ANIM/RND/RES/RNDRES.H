@@ -48,6 +48,7 @@ VOID YR4_RndTexInit( VOID );
 VOID YR4_RndTexClose( VOID );
 INT YR4_RndTexAddImg( CHAR *Name, INT W, INT H, INT C, DWORD *Bits );
 INT YR4_RndTexAdd( CHAR *FileName );
+INT YR4_RndTexAddFmt( CHAR *Name, INT W, INT H, INT GLType );
 
 /******** material handle *********/
 #define YR4_MAX_MATERIALS 3000

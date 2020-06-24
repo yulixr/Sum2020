@@ -11,7 +11,8 @@
 typedef struct
 {
   YR4_UNIT_BASE_FIELDS;
-  yr4PRIMS Pan;
+  yr4PRIMS Pan, Rock;
+  VEC Trans[10];
 } yr4UNIT_PANEL;
 
 /* Unit initialization function.
@@ -25,6 +26,7 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_PANEL *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimsLoad(&Uni->Pan, "BIN/MODELS/wood.g3dm");
+
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -40,7 +42,8 @@ static VOID YR4_UnitClose( yr4UNIT_PANEL *Uni, yr4ANIM *Ani )
   YR4_RndPrimsFree(&Uni->Pan);
 } /* End of 'YR4_UnitClose' function */
 
-/* Unit inter frame events handle function.
+/* Unit inter frame events handle functio
+n.
  * ARGUMENTS:
  *   - self-pointer to unit object:
  *       yr4UNIT_PANEL *Uni;
@@ -63,9 +66,10 @@ static VOID YR4_UnitResponse( yr4UNIT_PANEL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_PANEL *Uni, yr4ANIM *Ani )
 {
-  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(-50, -2, -100)), MatrRotateY(30), MatrScale(VecSet1(0.4))));
-  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(50, -20, -100)), MatrRotateY(-30), MatrScale(VecSet1(0.4))));
-  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(-100, -15, -150)), MatrRotateY(90), MatrScale(VecSet1(0.4))));
+  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(-50, -4, -100)), MatrRotateY(30), MatrScale(VecSet1(0.4))));
+  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(165, -15, -130)), MatrRotateY(-30), MatrScale(VecSet1(0.4))));
+  YR4_RndPrimsDraw(&Uni->Pan, MatrMulMatr3(MatrTranslate(VecSet(-45, -21, -160)), MatrRotateY(90), MatrScale(VecSet1(0.4))));
+  
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

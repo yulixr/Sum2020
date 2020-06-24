@@ -13,11 +13,11 @@
 typedef struct
 {
   YR4_UNIT_BASE_FIELDS;
-  yr4PRIM Grid;
-  yr4PRIMS City;
+  yr4PRIM Grid;         
+  yr4PRIMS Rock;
 } yr4UNIT_GRID;
 
-/* Unit initialization function.
+/* Unit initialization function.       
  * ARGUMENTS:
  *   - self-pointer to unit object:
  *       yr4UNIT_GRID *Uni;
@@ -32,7 +32,7 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
   yr4IMAGE img;
   INT k = 14;
   
-  yr4MATERIAL mtl = YR4_RndMaterials[0];
+  yr4MATERIAL mtl = YR4_RndMaterials[0], *m;
   
   if (YR4_RndImgLoad(&img, "mount.bmp"))
   {
@@ -55,7 +55,15 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
   }
   mtl = YR4_RndMtlGetDef();
   mtl.Tex[0] = YR4_RndTexAdd("mnt.bmp");
-  Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl);  
+  Uni->Grid.MtlNo = YR4_RndMtlAdd(&mtl); 
+                             
+  YR4_RndPrimsLoad(&Uni->Rock, "BIN/MODELS/rock1.g3dm");
+  m = YR4_RndMtlGet(Uni->Rock.Prims->MtlNo);
+  m->Tex[1] = mtl.Tex[0];
+  m->Tex[2] = YR4_RndTexAdd("mount.bmp");
+  m->ShdNo = YR4_RndShdAdd("ROCK");
+  Uni->Rock.Prims[0].InstanceCnt = 100;
+  Uni->Rock.Prims->MtlNo = YR4_RndMtlAdd(m); 
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -69,6 +77,7 @@ static VOID YR4_UnitInit( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
 static VOID YR4_UnitClose( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimFree(&Uni->Grid);
+  YR4_RndPrimsFree(&Uni->Rock);
 } /* End of 'YR4_UnitClose' function */
 
 
@@ -94,8 +103,9 @@ static VOID YR4_UnitResponse( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_GRID *Uni, yr4ANIM *Ani )
 {
-  YR4_RndPrimDraw(&Uni->Grid, MatrMulMatr(MatrTranslate(VecSet(-5, -30, -5)), 
-    MatrScale(VecSet1(0.4))));
+  YR4_RndPrimDraw(&Uni->Grid, MatrTranslate(VecSet(0, -30, 0))); 
+   /// MatrScale(VecSet1(0.4))));
+  YR4_RndPrimsDraw(&Uni->Rock, MatrIdentity());
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

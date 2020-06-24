@@ -29,6 +29,7 @@ static VOID YR4_UnitInit( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
 {
   YR4_RndPrimsLoad(&Uni->Pr, "BIN/MODELS/inj.g3dm");
  
+  Uni->Pos = VecSet(0, 5, 0);
   Uni->CamPos = VecSet(20, 10, 13);
   Uni->Pr.Trans = MatrScale(VecSet1(0.06));
 } /* End of 'YR4_UnitInit' function */
@@ -61,26 +62,28 @@ static VOID YR4_UnitResponse( yr4UNIT_SHIP *Uni, yr4ANIM *Ani )
   if (!Ani->IsPause && Ani->KeysClick[VK_SPACE])
   {
     Uni->Speed = 0;
-    Uni->Pos = VecSet1(0);
+    Uni->Pos = VecSet(0, 5, 0);
     Uni->CamPos = VecSet(20, 10, 13);
+    Uni->Head = 0;
   }
   if (Ani->IsPause)
   {
     Ani->DeltaTime = 0;
     Uni->Speed = 0;
   }
-  if (!Ani->IsPause)
+  if (!Ani->IsPause && !Ani->Keys[VK_TAB])
   {
-  Uni->Speed += !Ani->Keys[VK_SHIFT] * (1 + Ani->Keys[VK_CONTROL] * 3) * (Ani->Keys['W'] - Ani->Keys['S']) * 0.04 * Ani->DeltaTime;
-  Uni->Head += !Ani->Keys[VK_SHIFT] * (Ani->Keys['A'] - Ani->Keys['D']) * 37 * Ani->DeltaTime;
-  Uni->Pos.Y += (Ani->Keys[VK_ADD] - Ani->Keys[VK_SUBTRACT]) * 5 * Ani->DeltaTime;
-  Uni->Pos = VecAddVec(Uni->Pos,
-    VecMulNum(VectorTransform(VecSet(0, 0, -1), MatrRotateY(Uni->Head)), Uni->Speed));
- 
-  p = VecAddVec(Uni->Pos, VectorTransform(VecSet(1, 4, 10), MatrRotateY(Uni->Head)));
-  Uni->CamPos = VecAddVec(Uni->CamPos, VecMulNum(VecSubVec(p, Uni->CamPos), Ani->DeltaTime));
-  YR4_RndCamSet(Uni->CamPos,
-    Uni->Pos, VecSet(0, 1, 0));
+    Uni->Speed += !Ani->Keys[VK_SHIFT] * (1 + Ani->Keys[VK_CONTROL] * 3) * 
+      (Ani->Keys['W'] - Ani->Keys['S']) * 0.07 * Ani->DeltaTime;
+    Uni->Head += !Ani->Keys[VK_SHIFT] * (Ani->Keys['A'] - Ani->Keys['D']) * 37 * Ani->DeltaTime;
+    Uni->Pos.Y += (Ani->Keys[VK_ADD] - Ani->Keys[VK_SUBTRACT]) * 5 * Ani->DeltaTime;
+    Uni->Pos = VecAddVec(Uni->Pos,
+      VecMulNum(VectorTransform(VecSet(0, 0, -1), MatrRotateY(Uni->Head)), Uni->Speed));
+   
+    p = VecAddVec(Uni->Pos, VectorTransform(VecSet(2, 5, 10), MatrRotateY(Uni->Head)));
+    Uni->CamPos = VecAddVec(Uni->CamPos, VecMulNum(VecSubVec(p, Uni->CamPos), Ani->DeltaTime));
+    YR4_RndCamSet(Uni->CamPos,
+      Uni->Pos, VecSet(0, 1, 0));
   }
   p = VecDivNum(VecAddVec(Uni->Pr.Prims[9].MinBB, Uni->Pr.Prims[9].MaxBB), 2);
   Uni->Pr.Prims[9].Trans = Uni->Pr.Prims[7].Trans =

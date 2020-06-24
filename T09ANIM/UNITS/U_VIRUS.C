@@ -13,7 +13,8 @@ typedef struct
   YR4_UNIT_BASE_FIELDS;
   yr4PRIMS Vi;
   VEC Pos;
-  FLT Scale;
+  VEC Trans[120];
+  VEC Scale[120]; 
 } yr4UNIT_VIRUS;
 
 /* Unit initialization function.
@@ -27,17 +28,24 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_VIRUS *Uni, yr4ANIM *Ani )
 {
   yr4MATERIAL mtl;
-  INT k = (INT)(Rand0() * 15);
+  INT k = 10, i;
   YR4_RndPrimsLoad(&Uni->Vi, "BIN/MODELS/virus.g3dm");
   mtl = YR4_RndMaterials[0];
-  //mtl.Tex[0] = YR4_RndTexAdd("sars.bmp");
   mtl.Ka = MatLib[k].Ka;
   mtl.Kd = MatLib[k].Kd;
   mtl.Ks = MatLib[k].Ks;
   mtl.Ph = MatLib[k].Ph;
+  mtl.ShdNo = YR4_RndShdAdd("VIRUS");
   Uni->Vi.Prims->MtlNo = YR4_RndMtlAdd(&mtl); 
-  Uni->Pos = VecMulNum(VecSet(Rand1() * 15, Rand0() * 5, Rand1() * 14), 7);
-  Uni->Scale = 2 + Rand0() * 4;
+  srand(30);
+  for (i = 0; i < 35; i++)
+  {
+    Uni->Trans[i] = VecSet(Rand1() * 85, 8 + Rand0() * 30, Rand1() * 85);
+    Uni->Scale[i] = VecSet1(2 + Rand0() * 4);
+  }
+   Uni->Vi.Prims[0].InstanceCnt = 35;
+  // Uni->Pos = VecMulNum(VecSet(Rand1() * 15, Rand0() * 5, Rand1() * 14), 7);
+  //Uni->Speed = 4 * Rand0() + 1.5;   
 } /* End of 'YR4_UnitInit' function */
 
 /* Unit deinitialization function.
@@ -76,8 +84,20 @@ static VOID YR4_UnitResponse( yr4UNIT_VIRUS *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitRender( yr4UNIT_VIRUS *Uni, yr4ANIM *Ani )
 {
-  YR4_RndPrimsDraw(&Uni->Vi, MatrMulMatr4(MatrScale(VecSet1(Uni->Scale)), MatrTranslate(Uni->Pos), 
-    MatrRotateY(Ani->Time * 4), MatrTranslate(VecSet(0, 2 * sin(Ani->Time * 2), 0))));
+
+  INT id, loc;
+
+  id = Uni->Vi.Prims[0].MtlNo;
+  id = YR4_RndMaterials[id].ShdNo;
+  id = YR4_RndShaders[id].ProgId;
+  glUseProgram(id);
+
+  if ((loc = glGetUniformLocation(id, "Trans[0]")) != -1)
+    glUniform3fv(loc, 120, &Uni->Trans[0].X);
+  if ((loc = glGetUniformLocation(id, "Scale[0]")) != -1)
+    glUniform3fv(loc, 120, &Uni->Scale[0].X);
+ 
+  YR4_RndPrimsDraw(&Uni->Vi, MatrIdentity());  
 } /* End of 'YR4_UnitRender' function */
 
 /* Cow unit creation function.

@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include "../units.h"
+#include <math.h>
 
 /* Control unit type */
 typedef struct
@@ -16,7 +17,7 @@ typedef struct
     Elevator, /* Elevator angle */
     Azimuth; /* Azimuth angle */
 
-  yr4PRIM Axes;
+  yr4PRIM Axes, Debug;
 } yr4UNIT_CTRL;
 
 /* Unit initialization function.
@@ -30,7 +31,7 @@ typedef struct
 static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 {
   HFONT hFnt, hFntOld;
-  yr4MATERIAL mtl;
+  yr4MATERIAL mtl, m;
   yr4VERTEX V[] = 
   {
     {{0, 0, 0}, {0, 0}, {0, 0, 0}, {1, 0, 0, 1}},
@@ -44,6 +45,11 @@ static VOID YR4_UnitInit( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   mtl = YR4_RndMtlGetDef();
   mtl.ShdNo = YR4_RndShdAdd("AXES");
   Uni->Axes.MtlNo = YR4_RndMtlAdd(&mtl);
+
+  YR4_RndPrimCreate(&Uni->Debug, NULL, 1, NULL, 0, YR4_RND_PRIM_POINTS);
+  m = YR4_RndMtlGetDef();
+  m.ShdNo = YR4_RndShdAdd("DEBUG");
+  Uni->Debug.MtlNo = YR4_RndMtlAdd(&m);
 
   Uni->Azimuth = 20;
   Uni->Elevator = 1;
@@ -80,7 +86,7 @@ static VOID YR4_UnitClose( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
  */
 static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
 { 
-  FLT Wp, Hp, sx, sy;
+  FLT Wp, Hp, sx, sy, plen, cost, sint, cosp, sinp;
   VEC dv;
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
@@ -89,40 +95,55 @@ static VOID YR4_UnitResponse( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['S'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  Wp = YR4_RndProjSize;
-  Hp = YR4_RndProjSize;
+  if (Ani->IsPause || Ani->Keys[VK_TAB])
+   {
+      YR4_RndLightDir.X += Ani->DeltaTime * (Ani->Keys['L'] - Ani->Keys['J']);
+      YR4_RndLightDir.Z += Ani->DeltaTime * (Ani->Keys['I'] - Ani->Keys['K']);
 
-  if (Ani->W >= Ani->H)
-    Wp *= (FLT)Ani->W / Ani->H;
-  else
-    Hp *= (FLT)Ani->H / Ani->W;
+      Uni->Dist = VecLen(VecSubVec(YR4_RndCamLoc, YR4_RndCamAt));
+      Wp = YR4_RndProjSize;
+      Hp = YR4_RndProjSize;
 
-  sx = Wp / Ani->W * Uni->Dist / YR4_RndProjDist;
-  sy = Hp / Ani->H * Uni->Dist / YR4_RndProjDist;
+      if (Ani->W >= Ani->H)
+        Wp *= (FLT)Ani->W / Ani->H;
+      else
+        Hp *= (FLT)Ani->H / Ani->W;
 
-  dv = VecAddVec(VecMulNum(YR4_RndCamRight, -sx * Ani->Keys[VK_RBUTTON] * Ani->Mdy),
-                 VecMulNum(YR4_RndCamUp, sy * Ani->Keys[VK_RBUTTON] * Ani->Mdx));
-  YR4_RndCamAt = VecAddVec(YR4_RndCamAt, dv);
-  YR4_RndCamLoc = VecAddVec(YR4_RndCamLoc, dv);
+      sx = Wp / Ani->W * Uni->Dist / YR4_RndProjDist;
+      sy = Hp / Ani->H * Uni->Dist / YR4_RndProjDist;
 
-  Uni->Dist += Ani->GlobalDeltaTime * (-2.5 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
-  Uni->Azimuth += Ani->GlobalDeltaTime * (-26 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 50 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
-  Uni->Elevator += Ani->GlobalDeltaTime * (-26 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
+      dv = VecAddVec(VecMulNum(YR4_RndCamRight, -sx * Ani->Keys[VK_RBUTTON] * Ani->Mdy),
+                     VecMulNum(YR4_RndCamUp, sy * Ani->Keys[VK_RBUTTON] * Ani->Mdx));
+      YR4_RndCamAt = VecAddVec(YR4_RndCamAt, dv);
+      YR4_RndCamLoc = VecAddVec(YR4_RndCamLoc, dv);
 
-  if (Uni->Elevator > 89.99)
-    Uni->Elevator = 89.99;
-  else if (Uni->Elevator < -89.99)
-    Uni->Elevator = -89.99;
+      cost = (YR4_RndCamLoc.Y - YR4_RndCamAt.Y) / Uni->Dist;
+      sint = sqrt(1 - cost * cost);
+      plen = sint * Uni->Dist;
+      sinp = (YR4_RndCamLoc.X - YR4_RndCamAt.X) / plen;
+      cosp = (YR4_RndCamLoc.Z - YR4_RndCamAt.Z) / plen;
+      Uni->Azimuth = R2D(atan2(sinp, cosp));
+      Uni->Elevator = R2D(-PI / 2 + acos(cost));
 
-  if (Uni->Dist < 0.0002)
-    Uni->Dist = 0.0002;
-  if (Ani->IsPause)
-  YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
-                  MatrMulMatr3(MatrRotateX(Uni->Elevator),
-                              MatrRotateY(Uni->Azimuth),
-                              MatrTranslate(YR4_RndCamAt))),
-                YR4_RndCamAt,
-                VecSet(0, 1, 0));
+      Uni->Dist += Ani->GlobalDeltaTime * (-2.5 * Ani->Mdz + 8 * (1 + Ani->Keys[VK_SHIFT] * 30) * (Ani->Keys[VK_NEXT] - Ani->Keys[VK_PRIOR]));
+      Uni->Azimuth += Ani->GlobalDeltaTime * (-15 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 44 * (Ani->Keys[VK_RIGHT] - Ani->Keys[VK_LEFT]));
+      Uni->Elevator += Ani->GlobalDeltaTime * (-15 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 44 * (Ani->Keys[VK_DOWN] - Ani->Keys[VK_UP]));
+
+      if (Uni->Elevator > 89.9999)
+        Uni->Elevator = 89.99;
+      else if (Uni->Elevator < -89.9999)
+        Uni->Elevator = -89.99;
+
+      if (Uni->Dist < 0.0002)
+        Uni->Dist = 0.0002; 
+
+      YR4_RndCamSet(PointTransform(VecSet(0, 0, Uni->Dist),
+                      MatrMulMatr3(MatrRotateX(Uni->Elevator),
+                                  MatrRotateY(Uni->Azimuth),
+                                  MatrTranslate(YR4_RndCamAt))),
+                    YR4_RndCamAt,
+                    VecSet(0, 1, 0));
+   }
 } /* End of 'YR4_UnitResponse' function */
 
 /* Unit render function.
@@ -138,7 +159,9 @@ static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
   MATR m1, m2, m3;
   static CHAR Buf[1000];
 
-  YR4_RndFntDraw("BIG MOUNTAIN", VecSet(-25, 20,-10), 4, VecSet(1, 0, 1)); 
+  if(Ani->Time > 0 && Ani->Time < 10)
+    YR4_RndFntDraw("WELCOME\n COVID19", VecSet(-6, 5, -15), 4, VecSet(1, 0, 1)); 
+
   m1 = YR4_RndMatrView;
   m2 = YR4_RndMatrProj;
   m3 = YR4_RndMatrVP;
@@ -155,12 +178,37 @@ static VOID YR4_UnitRender( yr4UNIT_CTRL *Uni, yr4ANIM *Ani )
     Ani->FPS, glGetString(GL_RENDERER), glGetString(GL_VENDOR), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
   YR4_RndFntDraw(Buf, VecSet1(0), 1, VecSet1(1));
 
+  sprintf(Buf,
+    "press space to restart");
+  YR4_RndFntDraw(Buf, VecSet(Ani->W / 70.0, -Ani->H / 32.0, 0), 1, VecSet1(1));
+  
+  if (!Ani->Keys['M'])
+  {
+  sprintf(Buf,
+    "press and hold m to open music menu");
+  YR4_RndFntDraw(Buf, VecSet(Ani->W / 39.0, 0, 0), 1, VecSet1(1));
+  }
+  
+   if (Ani->Keys['M'])
+  {
+    sprintf(Buf,
+    "           press 1 to play corona\n press 2 to play samoizolatsia");
+    YR4_RndFntDraw(Buf, VecSet(Ani->W / 37.0, 0, 0), 1, VecSet1(1));
+  
+    sprintf(Buf,
+    " -hold V to increase volume\n          -B to reduce");
+    YR4_RndFntDraw(Buf, VecSet(Ani->W / 37.0, -2.5, 0), 1, VecSet1(1));
+  }
+ 
   YR4_RndMatrView = m1;
   YR4_RndMatrProj = m2;
   YR4_RndMatrVP = m3;
 
   glLineWidth(4);
-  YR4_RndPrimDraw(&Uni->Axes, MatrIdentity());
+  if (Ani->IsPause)
+    YR4_RndPrimDraw(&Uni->Axes, MatrIdentity()); 
+  if (Ani->Keys[VK_TAB] || Ani->IsPause)
+    YR4_RndPrimDraw(&Uni->Debug, MatrIdentity());
   glLineWidth(1);
 } /* End of 'YR4_UnitRender' function */
 

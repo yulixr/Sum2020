@@ -6,6 +6,7 @@
  */
 
 #include "rnd.h"
+#include <stdio.h>
 
 
 BOOL YR4_RndImgCreate( yr4IMAGE *Img, INT W, INT H )
@@ -37,7 +38,29 @@ BOOL YR4_RndImgLoad( yr4IMAGE *Img, CHAR *FileName )
   memset(Img, 0, sizeof(yr4IMAGE));
   hBm = LoadImage(NULL, FileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
   if (hBm == NULL)
+  {
+    FILE *F;
+
+    if ((F = fopen(FileName, "rb")) != NULL)
+    {
+      INT w = 0, h = 0;
+
+      fread(&w, 2, 1, F);
+      fread(&h, 2, 1, F);
+      fseek(F, 0, SEEK_END);
+      if (ftell(F) == w * h * 4 + 4)
+      {
+        if (YR4_RndImgCreate(Img, w, h))
+        {
+          rewind(F);
+          fread(Img->Pixels, 4, w * h, F);
+        }
+      }
+      fclose(F);
+      return TRUE;
+    }
     return FALSE;
+  }
 
   GetObject(hBm, sizeof(bm), &bm);
 

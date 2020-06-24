@@ -24,12 +24,11 @@ typedef struct
  */
 static VOID YR4_UnitInit( yr4UNIT_SKY *Uni, yr4ANIM *Ani )
 {
-  INT k = 11;
-  yr4MATERIAL mtl = YR4_RndMtlGetDef();
+  yr4MATERIAL mtl;
   
-  YR4_RndPrimCreateSphere(&Uni->Pr1, VecSet1(0), 250, 21, 10);
-  mtl = YR4_RndMaterials[0];
-  mtl.Tex[0] = YR4_RndTexAdd("sky2.bmp");
+  YR4_RndPrimCreateSphere(&Uni->Pr1, VecSet1(0), 270, 27, 13);
+  mtl = YR4_RndMtlGetDef();
+  mtl.Tex[0] = YR4_RndTexAdd("sky.bmp");
   mtl.ShdNo = YR4_RndShdAdd("SKY");
   mtl.Kd = VecSet1(0.9);
   Uni->Pr1.MtlNo = YR4_RndMtlAdd(&mtl); 

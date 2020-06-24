@@ -153,8 +153,12 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
     glUniformMatrix4fv(loc, 1, FALSE, w.M[0]);
   if ((loc = glGetUniformLocation(ProgId, "MatrWinv")) != -1)
     glUniformMatrix4fv(loc, 1, FALSE, winv.M[0]);
+  if ((loc = glGetUniformLocation(ProgId, "CamUp")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndCamUp.X);
   if ((loc = glGetUniformLocation(ProgId, "CamLoc")) != -1)
     glUniform3fv(loc, 1, &YR4_RndCamLoc.X);
+  if ((loc = glGetUniformLocation(ProgId, "CamRight")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndCamRight.X);
   if ((loc = glGetUniformLocation(ProgId, "Time")) != -1)
     glUniform1f(loc, YR4_Anim.Time);
   if ((loc = glGetUniformLocation(ProgId, "GlobalTime")) != -1)
@@ -178,19 +182,35 @@ VOID YR4_RndPrimDraw( yr4PRIM *Pr, MATR World )
   }
 
   /* Draw all triangles */
-  if (Pr->Ibuf != 0)
-  {
-    glBindVertexArray(Pr->VA);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->Ibuf);
-    glDrawElements(gl_prim_type, Pr->NumOfElements, GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
-  }
+  if (Pr->InstanceCnt < 2)
+    if (Pr->Ibuf != 0)
+    {
+      glBindVertexArray(Pr->VA);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->Ibuf);
+      glDrawElements(gl_prim_type, Pr->NumOfElements, GL_UNSIGNED_INT, NULL);
+      glBindVertexArray(0);
+    }
+    else
+    {
+      glBindVertexArray(Pr->VA);
+      glDrawArrays(gl_prim_type, 0, Pr->NumOfElements);
+      glBindVertexArray(0);
+    }
   else
-  {
-    glBindVertexArray(Pr->VA);
-    glDrawArrays(gl_prim_type, 0, Pr->NumOfElements);
-    glBindVertexArray(0);
-  }
+    if (Pr->Ibuf != 0)
+    {
+      glBindVertexArray(Pr->VA);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->Ibuf);
+      glDrawElementsInstanced(gl_prim_type, Pr->NumOfElements, GL_UNSIGNED_INT, NULL, 
+        Pr->InstanceCnt);
+      glBindVertexArray(0);
+    }
+    else
+    {
+      glBindVertexArray(Pr->VA);
+      glDrawArraysInstanced(gl_prim_type, 0, Pr->NumOfElements, Pr->InstanceCnt);
+      glBindVertexArray(0);
+    }
   glUseProgram(0);
 } /* End of 'YR4_RndPrimDraw' function */
 

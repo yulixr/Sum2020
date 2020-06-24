@@ -35,6 +35,14 @@ extern VEC YR4_RndCamLoc,
     YR4_RndCamUp;
 extern FLT YR4_RndShdAddon0, YR4_RndShdAddon1, YR4_RndShdAddon2;
 extern VEC YR4_RndShdAddonV0, YR4_RndShdAddonV1, YR4_RndShdAddonV2;
+
+
+extern INT YR4_RndShadowTexId;
+extern MATR YR4_RndShadowMatr;
+extern VEC YR4_RndLightDir;
+extern VEC YR4_RndLightColor;
+extern BOOL YR4_RndShadowPassFlag;
+
 typedef struct tagyr4VERTEX
 {
   VEC P; /* Vertex position */
@@ -61,6 +69,7 @@ typedef struct tagyr4PRIM
   MATR Trans; /* Additional transformation matrix */
   INT MtlNo; /* Material number in material array */
   VEC MinBB, MaxBB;
+  INT InstanceCnt;
 } yr4PRIM;
 
 VOID YR4_RndInit( HWND hWnd );
@@ -105,12 +114,19 @@ typedef struct tagyr4PRIMS
   INT NumOfPrims; /* Number of primitives in array */  
   yr4PRIM *Prims; /* Array of primitives */
   MATR Trans;     /* Common transformation matrix */
+  VEC MinBB, MaxBB;
 } yr4PRIMS;
 
 BOOL YR4_RndPrimsLoad( yr4PRIMS *Prs, CHAR *FileName );
 VOID YR4_RndPrimsDraw( yr4PRIMS *Prs, MATR World );
 VOID YR4_RndPrimsFree( yr4PRIMS *Prs );
 BOOL YR4_RndPrimsCreate( yr4PRIMS *Prs, INT NumOfPrims );
+VOID YR4_RndPrimsEvalBB( yr4PRIMS *Prs );
+
+/*********** light handle *******/
+VOID YR4_RndLightShadow( VOID );
+VOID YR4_RndLightInit( VOID );
+VOID YR4_RndLightClose( VOID );
 
 #endif
 /* END OF 'RND.H' FILE */

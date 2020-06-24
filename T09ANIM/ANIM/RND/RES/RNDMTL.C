@@ -104,9 +104,17 @@ INT YR4_RndMtlApply( INT MtlNo )
     glUniform1f(loc, mtl->Ph);
   if ((loc = glGetUniformLocation(prg, "Trans")) != -1)
     glUniform1f(loc, mtl->Trans);
+   if ((loc = glGetUniformLocation(prg, "ShadowMatr")) != -1)
+     glUniformMatrix4fv(loc, 1, FALSE, YR4_RndShadowMatr.M[0]);
+  if ((loc = glGetUniformLocation(prg, "LightDir")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndLightDir.X);
+  if ((loc = glGetUniformLocation(prg, "LightColor")) != -1)
+    glUniform3fv(loc, 1, &YR4_RndLightColor.X);
+  if ((loc = glGetUniformLocation(prg, "IsShadowPass")) != -1)
+    glUniform1f(loc, YR4_RndShadowPassFlag);
 
   /* Textures handle */
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 7; i++)
   {
     CHAR tname[] = "IsTexture0";
 
@@ -114,14 +122,18 @@ INT YR4_RndMtlApply( INT MtlNo )
     tname[9] = '0' + i;
     if (mtl->Tex[i] != -1)
     {
-      if ((loc = glGetUniformLocation(prg, "Texture0")) != -1)
-        glUniform1f(loc, 0);
+     // if ((loc = glGetUniformLocation(prg, tname + 2)) != -1)
+     //   glUniform1f(loc, i);
       glActiveTexture(GL_TEXTURE0 + i);
       glBindTexture(GL_TEXTURE_2D, YR4_RndTextures[mtl->Tex[i]].TexId);
     }
     if ((loc = glGetUniformLocation(prg, tname)) != -1)
       glUniform1i(loc, mtl->Tex[i] != -1);
-  }      
+  } 
+ // if ((loc = glGetUniformLocation(prg, "ShadowMap")) != -1)
+ //   glUniform1i(loc, 8);
+  glActiveTexture(GL_TEXTURE0 + 8);
+  glBindTexture(GL_TEXTURE_2D, YR4_RndShadowTexId);
   return prg;
 } /* End of 'YR4_RndMtlApply' function */
 

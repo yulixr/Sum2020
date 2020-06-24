@@ -10,6 +10,7 @@
 #define __ANIM_H_
 
 #include "rnd/rnd.h"
+#include "snd/snd.h"
 
 #define YR4_MAX_UNITS 2000
 

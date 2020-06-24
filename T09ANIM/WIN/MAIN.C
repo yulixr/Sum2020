@@ -63,14 +63,15 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   for(i = 0; i < 9; i++)
     YR4_AnimAddUnit(YR4_UnitCreateBall());
   YR4_AnimAddUnit(YR4_UnitCreateCow());*/
-   for(i = 0; i < 15; i++)
-    YR4_AnimAddUnit(YR4_UnitCreateVirus());
+  YR4_AnimAddUnit(YR4_UnitCreateVirus());
   YR4_AnimAddUnit(YR4_UnitCreateSky());
   YR4_AnimAddUnit(YR4_UnitCreateShip());
   YR4_AnimAddUnit(YR4_UnitCreateGrid());
   YR4_AnimAddUnit(YR4_UnitCreateCtrl());
   YR4_AnimAddUnit(YR4_UnitCreatePanel());
- 
+  YR4_AnimAddUnit(YR4_UnitCreateSnd());
+  //YR4_AnimAddUnit(YR4_UnitCreateSmoke());
+
   /* Message loop */
   while (TRUE)
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

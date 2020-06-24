@@ -43,6 +43,32 @@ VOID YR4_RndPrimsFree( yr4PRIMS *Prs )
   memset(Prs, 0, sizeof(yr4PRIMS));
 } /* End of 'YR4_RndPrimsFree' function */
 
+VOID YR4_RndPrimsEvalBB( yr4PRIMS *Prs )
+{
+  INT i;
+
+  if (Prs->NumOfPrims > 0)
+  {
+    Prs->MinBB = Prs->Prims[0].MinBB;
+    Prs->MaxBB = Prs->Prims[0].MaxBB;
+    for (i = 1; i < Prs->NumOfPrims; i++)
+    {
+      if (Prs->MinBB.X > Prs->Prims[i].MinBB.X)
+        Prs->MinBB.X = Prs->Prims[i].MinBB.X;
+      if (Prs->MinBB.Y > Prs->Prims[i].MinBB.Y)
+        Prs->MinBB.Y = Prs->Prims[i].MinBB.Y;
+      if (Prs->MinBB.Z > Prs->Prims[i].MinBB.Z)
+        Prs->MinBB.Z = Prs->Prims[i].MinBB.Z;
+
+      if (Prs->MaxBB.X < Prs->Prims[i].MaxBB.X)
+        Prs->MaxBB.X = Prs->Prims[i].MaxBB.X;      
+      if (Prs->MaxBB.Y < Prs->Prims[i].MaxBB.Y)
+        Prs->MaxBB.Y = Prs->Prims[i].MaxBB.Y;     
+      if (Prs->MaxBB.Z < Prs->Prims[i].MaxBB.Z)
+        Prs->MaxBB.Z = Prs->Prims[i].MaxBB.Z;
+    }
+  }
+}
 /* Draw array of primitives function.
  * ARGUMENTS:
  *   - pointer to primitives structure:
@@ -209,6 +235,7 @@ BOOL YR4_RndPrimsLoad( yr4PRIMS *Prs, CHAR *FileName )
   }
   fclose(F);
   free(mem);
+  YR4_RndPrimsEvalBB(Prs);
   return TRUE;
 } /* End of 'YR4_RndPrimsLoad' function */
 

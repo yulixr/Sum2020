@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="X:\TGRKIT\LIB;$(OPENAL_DIR)Lib;"
+				AdditionalLibraryDirectories="X:\TGRKIT\LIB;$(OPENAL_DIR)libs;"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -245,6 +245,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\ANIM\RND\RNDLIGHT.C"
+						>
+					</File>
+					<File
 						RelativePath=".\ANIM\RND\RNDPRIM.C"
 						>
 					</File>
@@ -281,6 +285,14 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="Audio System"
+					>
+					<File
+						RelativePath=".\ANIM\SND\SND.H"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Windows Depended"
@@ -302,10 +314,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UNITS\U_COW.C"
-					>
-				</File>
-				<File
 					RelativePath=".\UNITS\U_CTRL.C"
 					>
 				</File>
@@ -319,6 +327,14 @@
 				</File>
 				<File
 					RelativePath=".\UNITS\U_SKY.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_SMOKE.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS\U_SND.C"
 					>
 				</File>
 				<File

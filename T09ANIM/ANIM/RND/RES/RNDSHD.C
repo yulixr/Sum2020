@@ -79,7 +79,8 @@ INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix )
   } shd[] = 
   {
     {"VERT", GL_VERTEX_SHADER},
-    {"FRAG", GL_FRAGMENT_SHADER}
+    {"FRAG", GL_FRAGMENT_SHADER},
+    {"GEOM", GL_GEOMETRY_SHADER}
   };
   INT prg, i, res, NoofS = sizeof(shd) / sizeof(shd[0]);
   CHAR *txt;
@@ -92,6 +93,11 @@ INT YR4_RndShdLoad( CHAR *ShaderFileNamePrefix )
     sprintf(Buf, "BIN/SHADERS/%s/%s.GLSL", ShaderFileNamePrefix, shd[i].Name);
     txt = YR4_RndShdLoadTextFromFile(Buf);
 
+    if (shd[i].Type != GL_VERTEX_SHADER && shd[i].Type != GL_FRAGMENT_SHADER &&
+      txt == NULL)
+    {
+      continue;
+    }
     /* load shader text */
     if (txt == NULL)
     {

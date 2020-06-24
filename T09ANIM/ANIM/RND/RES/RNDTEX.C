@@ -85,4 +85,52 @@ INT YR4_RndTexAdd( CHAR *FileName )
   return n;
 }
 
+/* Add new texture to texture store system by OpenGL format function.
+ * ARGUMENTS:
+ *   - texture name:
+ *       CHAR *Name;
+ *   - texture size:
+ *       INT W, H;
+ *   - OpenGL data type:
+ *       INT GLType;
+ * RETURNS:
+ *   (INT) added texture table number.
+ */
+INT YR4_RndTexAddFmt( CHAR *Name, INT W, INT H, INT GLType )
+{
+  INT w, h, fmt;
+ // PFNGLTEXSTORAGE2DPROC abc = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D");
+  VOID *ptr;
+ // PFNGLTEXTURESTORAGE2DPROC abc1 = (PFNGLTEXTURESTORAGE2DPROC)wglGetProcAddress("glTextureStorage2D");
+
+  /* Check for free space */
+  if (YR4_RndTexturesSize >= YR4_MAX_TEXTURES)
+    return -1;
+
+  strncpy(YR4_RndTextures[YR4_RndTexturesSize].Name, Name, YR4_STR_MAX - 1);
+  YR4_RndTextures[YR4_RndTexturesSize].W = W;
+  YR4_RndTextures[YR4_RndTexturesSize].H = H;
+  glGenTextures(1, &YR4_RndTextures[YR4_RndTexturesSize].TexId);
+
+  glBindTexture(GL_TEXTURE_2D, YR4_RndTextures[YR4_RndTexturesSize].TexId);
+  /*
+  ptr = malloc(W * H * 4);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, W, H, 0, GL_DEPTH_COMPONENT, GL_FLOAT, ptr);
+  free(ptr);   */
+  glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, W, H);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, YR4_RndTextures[YR4_RndTexturesSize].TexId, 0);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &fmt);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  return YR4_RndTexturesSize++;
+} /* End of 'YR4_RndTexAddFmt' function */
+
+
 /* END OF 'RNDTEX.C' FILE */

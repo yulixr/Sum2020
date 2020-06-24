@@ -18,6 +18,7 @@ VOID YR4_AnimInit( HWND hWnd )
 
   YR4_TimerInit();
   YR4_AnimInputInit();
+  YR4_RndLightInit();
 }
 
 VOID YR4_AnimClose( VOID )
@@ -31,6 +32,7 @@ VOID YR4_AnimClose( VOID )
     YR4_Anim.Units[i] = NULL;
   }
   YR4_Anim.NumOfUnits = 0;
+  YR4_RndLightClose();
   YR4_RndClose();
 }
 

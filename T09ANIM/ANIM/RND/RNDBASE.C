@@ -131,6 +131,9 @@ VOID YR4_RndStart( VOID )
     reload_time = t;
   }
 #endif
+
+  YR4_RndLightShadow();
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } /* End of 'YR4_RndStart' function */
 
